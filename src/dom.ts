@@ -1,6 +1,8 @@
 // Winziger DOM-Helfer. Alles läuft über textContent/Attribute – nutzergenerierte Inhalte
 // werden NIE als HTML eingefügt (Schutz vor Skript-Einschleusung).
-type Child = Node | string | number | null | undefined | false
+import { withBase } from './router'
+
+type Child =Node | string | number | null | undefined | false
 type Attrs = Record<string, unknown> | null
 
 export function h<K extends keyof HTMLElementTagNameMap>(
@@ -16,6 +18,7 @@ export function h<K extends keyof HTMLElementTagNameMap>(
     else if (k === 'value') (el as unknown as HTMLInputElement).value = String(v)
     else if (k === 'checked') (el as unknown as HTMLInputElement).checked = !!v
     else if (k === 'selected') (el as unknown as HTMLOptionElement).selected = !!v
+    else if (k === 'href' && typeof v === 'string') el.setAttribute(k, withBase(v))
     else if (v === true) el.setAttribute(k, '')
     else el.setAttribute(k, String(v))
   }

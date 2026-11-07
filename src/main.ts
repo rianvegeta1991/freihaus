@@ -70,6 +70,8 @@ async function start(): Promise<void> {
   session.user = await api.getUser().catch(() => null)
   api.onAuthChange((u) => { session.user = u; drawHeader() })
 
+  // Die Demo mit Beispieldaten soll nicht in Suchmaschinen auftauchen.
+  if (api.mode === 'demo') document.head.append(h('meta', { name: 'robots', content: 'noindex, nofollow' }))
   app.append(header, main, footer)
   drawHeader(); drawFooter(); installLinkHandler()
 

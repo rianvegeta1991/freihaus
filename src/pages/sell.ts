@@ -1,7 +1,7 @@
 import { api } from '../api'
 import { h, clear } from '../dom'
 import { compressImage } from '../image'
-import { navigate, type Route } from '../router'
+import { navigate, withBase, type Route } from '../router'
 import type { ListingInput, Photo } from '../types'
 import { emptyInput, ENERGY_CLASSES, energyHint, hasErrors, MAX_PHOTOS, MIN_PHOTOS, validateListing, type Errors } from '../validation'
 import { errMsg, field, session, setTitle, spinner, toast } from '../ui'
@@ -181,7 +181,7 @@ export async function renderSell(r: Route): Promise<HTMLElement> {
   async function persist(): Promise<void> {
     id = await api.saveDraft(input, id)
     // Nur die Adresszeile anpassen (kein Neuaufbau), damit ein Neuladen den Entwurf wiederfindet.
-    if (!editId && window.location.pathname === '/verkaufen') window.history.replaceState({}, '', `/verkaufen/${id}`)
+    if (!editId && window.location.pathname === withBase('/verkaufen')) window.history.replaceState({}, '', withBase(`/verkaufen/${id}`))
   }
   function collect(): Errors {
     const all = validateListing(input, photos.length)

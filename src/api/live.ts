@@ -2,6 +2,7 @@
 // (es gab beim Schreiben noch keines). Die Datenbankregeln selbst sind in tests/db.test.ts geprüft;
 // ob die Aufrufe hier sie korrekt ansprechen, zeigt erst der erste Lauf gegen ein Projekt.
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { withBase } from '../router'
 import type {
   Api, ContactInfo, Listing, ListingInput, ListingStatus, Message, ModerationEntry, Photo, Report, SearchFilter, User,
 } from '../types'
@@ -65,7 +66,7 @@ export function createLiveApi(url: string, anonKey: string): Api {
     getUser: currentUser,
     onAuthChange(cb) { sb.auth.onAuthStateChange(() => { void currentUser().then(cb) }) },
     async signIn(email) {
-      const { error } = await sb.auth.signInWithOtp({ email: email.trim(), options: { emailRedirectTo: window.location.origin + '/konto' } })
+      const { error } = await sb.auth.signInWithOtp({ email: email.trim(), options: { emailRedirectTo: window.location.origin + withBase('/konto') } })
       fail(error)
       return { sent: true }
     },

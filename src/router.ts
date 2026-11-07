@@ -4,7 +4,13 @@ export interface Route {
   path: string
 }
 
-type Handler = (r: Route) => void | Promise<void>
+/** Unterpfad, unter dem die Seite liegt (z. B. "/freihaus" auf GitHub Pages, sonst leer). */
+export const BASE = (import.meta.env.BASE_URL || '/').replace(/\/$/, '')
+/** Interne Adresse ("/suche") in die echte Adresse (inkl. Unterpfad) verwandeln. */
+export const withBase = (p: string): string => (p.startsWith('/') && !p.startsWith('//') ? BASE + p : p)
+const stripBase = (p: string): string => (BASE && (p === BASE || p.startsWith(BASE + '/')) ? p.slice(BASE.length) || '/' : p)
+
+type Handler =(r: Route) => void | Promise<void>
 const routes: { pattern: RegExp; keys: string[]; handler: Handler }[] = []
 let notFound: Handler = () => {}
 
@@ -16,7 +22,7 @@ export function route(pattern: string, handler: Handler): void {
 export function setNotFound(h: Handler): void { notFound = h }
 
 export async function resolve(): Promise<void> {
-  const path = window.location.pathname
+  const path = stripBase(window.location.pathname)
   const query = new URLSearchParams(window.location.search)
   for (const r of routes) {
     const m = r.pattern.exec(path)
@@ -31,8 +37,8 @@ export async function resolve(): Promise<void> {
 }
 
 export function navigate(to: string, replace = false): void {
-  if (replace) window.history.replaceState({}, '', to)
-  else window.history.pushState({}, '', to)
+  if (replace) window.history.replaceState({}, '', withBase(to))
+  else window.history.pushState({}, '', withBase(to))
   void resolve()
 }
 
@@ -44,8 +50,9 @@ export function installLinkHandler(): void {
     if (!a || a.target === '_blank' || a.hasAttribute('download')) return
     const href = a.getAttribute('href')
     if (!href || !href.startsWith('/') || href.startsWith('//')) return
+    if (BASE && !(href === BASE || href.startsWith(BASE + '/'))) return
     ev.preventDefault()
-    navigate(href)
+    navigate(stripBase(href))
   })
   window.addEventListener('popstate', () => { void resolve() })
 }
