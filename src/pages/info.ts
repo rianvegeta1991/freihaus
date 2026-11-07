@@ -40,7 +40,7 @@ export async function renderTransparency(_r: Route): Promise<HTMLElement> {
   return page('Wer finanziert FreiHaus?',
     h('p', { class: 'lead' }, 'FreiHaus ist kostenlos – für alle, dauerhaft. Hier steht ehrlich, wie das geht.'),
     h('h2', null, 'Heute'),
-    h('p', null, `FreiHaus wird von ${NAME} privat finanziert. Die laufenden Kosten (Server, E-Mail, Prüfung) liegen bei rund [BETRAG] € im Monat. Es gibt keine Werbung, keine Provision und keinen Datenverkauf.`),
+    h('p', null, `FreiHaus wird von ${NAME} privat finanziert. Es gibt keine Werbung, keine Provision und keinen Datenverkauf.`),
     h('h2', null, 'Was wir nie tun'),
     h('ul', null,
       h('li', null, 'Provisionen oder Erfolgsgebühren verlangen – weder von Verkäufern noch von Käufern.'),
@@ -87,10 +87,9 @@ export async function renderTerms(_r: Route): Promise<HTMLElement> {
     h('h2', null, '3. Wer inserieren darf'), h('p', null, 'Nur Privatpersonen, die Eigentümer sind oder zum Verkauf berechtigt. Makler und gewerbliche Anbieter dürfen nicht inserieren.'),
     h('h2', null, '4. Pflichten der Inserenten'),
     h('ul', null, h('li', null, 'Wahrheitsgemäße, vollständige Angaben – insbesondere die Pflichtangaben zum Energieausweis.'), h('li', null, 'Nur Fotos und Texte, an denen Sie alle Rechte besitzen.'), h('li', null, 'Keine Forderung von Vorauszahlungen.')),
-    h('h2', null, '5. Rechteeinräumung'), h('p', null, 'Sie räumen FreiHaus ein einfaches, unentgeltliches, auf die Dauer des Inserats beschränktes Recht ein, Fotos und Texte anzuzeigen, zu verkleinern und für Suchmaschinen verfügbar zu machen. [ANWALT PRÜFT UMFANG].'),
+    h('h2', null, '5. Rechteeinräumung'), h('p', null, 'Sie räumen FreiHaus ein einfaches, unentgeltliches, auf die Dauer des Inserats beschränktes Recht ein, Fotos und Texte anzuzeigen, zu verkleinern und für Suchmaschinen verfügbar zu machen.'),
     h('h2', null, '6. Moderation'), h('p', null, 'Es gelten die Regeln unter „So moderieren wir“. Wir dürfen Inhalte entfernen und Konten sperren, wenn gegen diese Bedingungen oder geltendes Recht verstoßen wird.'),
-    h('h2', null, '7. Laufzeit der Inserate'), h('p', null, 'Inserate laufen 90 Tage und können verlängert werden. Abgelaufene Inserate werden nach 30 Tagen gelöscht.'),
-    h('h2', null, '8. Haftung'), h('p', null, '[ANWALT FORMULIERT HAFTUNGSBEGRENZUNG UND HINWEIS: KEINE PRÜFUNG DER OBJEKTE].'))
+    h('h2', null, '7. Laufzeit der Inserate'), h('p', null, 'Inserate laufen 90 Tage und können verlängert werden. Abgelaufene Inserate werden nach 30 Tagen gelöscht.'))
 }
 
 export async function renderPrivacy(_r: Route): Promise<HTMLElement> {
@@ -106,8 +105,11 @@ export async function renderPrivacy(_r: Route): Promise<HTMLElement> {
       h('li', null, h('strong', null, 'Sicherheit: '), 'Zugriffsprotokolle, Zähler für Kontaktaufrufe und Nachrichten (berechtigtes Interesse, Betrugs- und Spam-Abwehr).'),
       h('li', null, h('strong', null, 'Kontaktformular: '), 'Name, E-Mail-Adresse und Nachricht, nur um Ihnen zu antworten (Art. 6 Abs. 1 lit. b bzw. f DSGVO). Zur Spam-Abwehr zählen wir die Nachrichten je Adresse; eine IP-Adresse speichern wir dafür nicht.'),
       h('li', null, h('strong', null, 'Reichweitenmessung: '), 'Keine. Wir messen keine Besucherzahlen und setzen keine Statistik- oder Tracking-Dienste ein.')),
-    h('h2', null, 'Empfänger / Auftragsverarbeiter'), h('p', null, '[Supabase (Hosting/Datenbank, Region Frankfurt), Cloudflare (Auslieferung/Bot-Schutz), E-Mail-Dienstleister – jeweils mit Auftragsverarbeitungsvertrag].'),
-    h('h2', null, 'Speicherdauer'), h('p', null, 'Inserate: 90 Tage Laufzeit, danach 30 Tage Verlängerungsfenster, dann Löschung. Konto: bis zur Löschung durch Sie. Meldungen und Begründungen: [3 Jahre]. Zugriffsprotokolle: [7–14 Tage].'),
+    h('h2', null, 'Empfänger / Auftragsverarbeiter'), h('ul', null,
+      h('li', null, h('strong', null, 'Supabase '), '(Datenbank, Anmeldung samt Versand der Anmelde-E-Mails, Bildspeicher; Rechenzentrum in Frankfurt am Main).'),
+      h('li', null, h('strong', null, 'Cloudflare '), '(Auslieferung der Seiten und Schutz vor Missbrauch).'),
+      h('li', null, h('strong', null, 'Proton '), '(E-Mail-Postfach, über das wir Ihre Nachrichten an kontakt.freihaus@proton.me empfangen).')),
+    h('p', null, 'Mit den Dienstleistern schließen wir Auftragsverarbeitungsverträge. Darüber hinaus geben wir Daten nicht weiter.'),
     h('h2', null, 'Ihre Rechte'), h('p', null, 'Auskunft, Berichtigung, Löschung, Einschränkung, Übertragbarkeit, Widerspruch und Beschwerde bei der Aufsichtsbehörde. Wenden Sie sich dafür an ', mail(), '.'),
     h('h2', null, 'Cookies'), h('p', null, 'FreiHaus setzt nur technisch notwendige Speicherungen (z. B. Anmeldung). Es gibt keine Werbe- oder Tracking-Cookies, deshalb keinen Cookie-Banner. Schriften liegen auf unserem Server.'))
 }
