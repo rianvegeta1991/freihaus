@@ -84,7 +84,7 @@ export async function renderAccount(r: Route): Promise<HTMLElement> {
 
   void api.saved().then((s) => {
     clear(savedBox); savedBox.append(h('h2', null, 'Meine Merkliste'))
-    savedBox.append(s.length ? h('div', { class: 'grid' }, s.map(listingCard)) : h('p', { class: 'empty' }, 'Noch nichts gemerkt.'))
+    savedBox.append(s.length ? h('div', { class: 'grid' }, s.map((l) => listingCard(l))) : h('p', { class: 'empty' }, 'Noch nichts gemerkt.'))
   }).catch((e) => { clear(savedBox); savedBox.append(h('p', { class: 'err' }, errMsg(e))) })
 
   void api.moderationLog().then((entries) => {

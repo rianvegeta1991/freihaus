@@ -118,7 +118,7 @@ input[type='checkbox'] { width: 24px; min-height: 24px; height: 24px; flex: none
 @media (min-width: 640px) { .trust { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 960px) { .trust { grid-template-columns: repeat(4, 1fr); } }
 .trust-item { background: #fff; border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
-.trust-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--amber-soft); color: var(--amber-dark); display: grid; place-items: center; font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+.trust-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--amber-soft); color: #a65f00; display: grid; place-items: center; font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
 .counter { color: var(--muted); margin-top: 16px; }
 .ticks { list-style: none; padding: 0; }
 .ticks li::before { content: '✔ '; color: var(--blue); font-weight: 700; }

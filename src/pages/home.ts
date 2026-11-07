@@ -22,7 +22,7 @@ export async function renderHome(_r: Route): Promise<HTMLElement> {
     h('section', { class: 'wrap section' },
       h('div', { class: 'section-head' }, h('h2', null, 'Neu inseriert'), h('a', { href: '/suche' }, 'Alle ansehen →')),
       latest.length
-        ? h('div', { class: 'grid' }, latest.slice(0, 6).map(listingCard))
+        ? h('div', { class: 'grid' }, latest.slice(0, 6).map((l) => listingCard(l)))
         : h('p', { class: 'empty' }, 'Noch keine Inserate. Seien Sie die oder der Erste – ', h('a', { href: '/verkaufen' }, 'jetzt inserieren'), '.')),
 
     h('section', { class: 'band' },

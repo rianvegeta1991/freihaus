@@ -71,7 +71,7 @@ export async function renderListing(r: Route): Promise<HTMLElement> {
   const similar = h('section', { class: 'similar' })
   void api.search({ q: l.postalCode.slice(0, 3), sort: 'neu' }).then((all) => {
     const others = all.filter((x) => x.id !== l.id).slice(0, 3)
-    if (others.length) similar.append(h('h2', null, 'Ähnliche Inserate in der Nähe'), h('div', { class: 'grid' }, others.map(listingCard)))
+    if (others.length) similar.append(h('h2', null, 'Ähnliche Inserate in der Nähe'), h('div', { class: 'grid' }, others.map((l) => listingCard(l))))
   }).catch(() => {})
 
   return h('div', { class: 'wrap section' },

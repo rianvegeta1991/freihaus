@@ -61,7 +61,8 @@ export function facts(l: Listing): string[] {
   return out
 }
 
-export function listingCard(l: Listing): HTMLElement {
+/** `level`: Überschriftenebene des Titels – direkt unter einer h1 (Suche) ist es h2, sonst h3. */
+export function listingCard(l: Listing, level: 2 | 3 = 3): HTMLElement {
   const p = l.photos[0]
   return h('a', { class: 'card', href: `/inserat/${l.id}` },
     h('div', { class: 'card-img' },
@@ -69,7 +70,7 @@ export function listingCard(l: Listing): HTMLElement {
       h('span', { class: 'badge badge-main card-badge' }, 'Von privat')),
     h('div', { class: 'card-body' },
       h('div', { class: 'card-price' }, fmtEur(l.priceEur), l.livingAreaM2 ? h('span', { class: 'per' }, ` · ${fmtPerM2(l.priceEur, l.livingAreaM2)}`) : null),
-      h('h3', { class: 'card-title' }, l.title),
+      h(`h${level}`, { class: 'card-title' }, l.title),
       h('p', { class: 'card-facts' }, facts(l).join(' · ')),
       h('p', { class: 'card-loc' }, `${l.postalCode} ${l.city}${l.district ? `-${l.district}` : ''}`,
         l.energyClass ? h('span', { class: 'energy' }, `  ·  Energieklasse ${l.energyClass}`) : null)))

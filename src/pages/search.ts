@@ -49,7 +49,7 @@ export async function renderSearch(r: Route): Promise<HTMLElement> {
       results.append(
         h('p', { class: 'count' }, `${fmtNum(list.length)} ${list.length === 1 ? 'Inserat' : 'Inserate'}${f.q ? ` für „${f.q}“` : ''}`),
         list.length
-          ? h('div', { class: 'grid' }, list.map(listingCard))
+          ? h('div', { class: 'grid' }, list.map((l) => listingCard(l, 2)))
           : h('div', { class: 'empty' },
             h('p', null, h('strong', null, 'Keine Treffer.'), ' Versuchen Sie es mit weniger Filtern oder einem größeren Umkreis (nur die ersten Ziffern der Postleitzahl).'),
             h('p', null, 'Bald können Sie hier einen Suchauftrag anlegen und per E-Mail benachrichtigt werden, sobald etwas Passendes erscheint.')))

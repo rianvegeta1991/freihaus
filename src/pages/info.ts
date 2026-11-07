@@ -126,7 +126,9 @@ export async function renderA11y(_r: Route): Promise<HTMLElement> {
   return page('Barrierefreiheit',
     draft('Bitte mit dem tatsächlichen Prüfstand ergänzen.'),
     h('p', null, 'Wir möchten, dass alle FreiHaus nutzen können, und richten uns nach den Web Content Accessibility Guidelines (WCAG 2.1, Stufe AA). Dazu gehören gut lesbare Schrift, ausreichende Kontraste, Bedienung per Tastatur und Zuordnung aller Formularfelder. Status werden nie allein über Farbe angezeigt.'),
-    h('p', null, 'Stand der Prüfung: [DATUM / ERGEBNIS]. Barrieren melden Sie bitte an ', mail(), '.'))
+    h('h2', null, 'Stand der Prüfung (8. November 2026)'),
+    h('p', null, 'Wir haben alle Seiten selbst automatisch geprüft, am Rechner und in Handybreite (375 Pixel). Geprüft wurden: Seitensprache und Seitentitel, Überschriftenstruktur, Seitenbereiche (Kopf, Navigation, Inhalt, Fuß), Beschriftung aller Formularfelder, Namen von Knöpfen und Links, Textalternativen für Bilder, Farbkontraste (mindestens 4,5:1 für Text, 3:1 für große Schrift), Mindestgröße der Klickflächen (24 Pixel) und seitliches Scrollen. Ergebnis: keine Abweichungen.'),
+    h('p', null, 'Nicht geprüft sind die Bedienung mit einem Screenreader, die vollständige Tastaturbedienung von Hand, 200 % Vergrößerung und die Bildinhalte der Inserate. Das Ergebnis ist deshalb keine Konformitätserklärung. Barrieren melden Sie uns bitte per ', h('a', { href: '/kontakt' }, 'Kontaktformular'), ' oder an ', mail(), '.'))
 }
 
 export async function renderNotFound(_r: Route): Promise<HTMLElement> {

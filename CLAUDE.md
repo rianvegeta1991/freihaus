@@ -30,6 +30,12 @@ Honeypot + 3-Sekunden-Sperre im Browser, in der Datenbank max. 3 Nachrichten/Adr
 Nachrichten erscheinen in der Moderation unter „Kontaktnachrichten“. Es gibt **keine E-Mail-Benachrichtigung** – die Moderation muss
 dort nachsehen (Punkt 3 der offenen Punkte).
 
+**Barrierefreiheit (8.11.2026):** Eigene Prüfung per Skript im Browser (Sprache, Titel, Überschriften, Landmarks, Beschriftungen,
+Kontraste, Klickflächen ≥ 24 px, Überlauf) über alle Seiten, Desktop und 375 px – keine Abweichungen; Ergebnis steht auf
+`/barrierefreiheit`. **Nicht** gemacht: Screenreader, Tastatur von Hand, 200 % Zoom. Ein externes Prüfwerkzeug (axe-core per CDN)
+wurde vom System abgelehnt; bei Bedarf axe-core als Entwicklungs-Abhängigkeit installieren statt von einem CDN zu laden.
+Neue Seiten müssen die Überschriftenfolge einhalten (`listingCard(l, 2)` direkt unter einer h1).
+
 ## Entwicklung
 
 - Node liegt portabel unter `C:\Users\Bastian\tools\node` (in Shells erst `$env:PATH` bzw. `export PATH` setzen).
