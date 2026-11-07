@@ -60,6 +60,8 @@ main:focus { outline: none; }
 .nav a { color: var(--text); text-decoration: none; font-weight: 600; padding: 10px 2px; min-height: 44px; display: inline-flex; align-items: center; }
 .nav a:hover { color: var(--blue); text-decoration: underline; }
 .nav .btn { padding: 8px 16px; }
+.nav a.btn-secondary, .nav a.btn-secondary:hover { color: #fff; text-decoration: none; }
+.nav a.btn-secondary { padding: 8px 16px; }
 
 /* Buttons */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 10px 20px; border-radius: 10px; border: 2px solid transparent; font: inherit; font-weight: 700; cursor: pointer; text-decoration: none; line-height: 1.2; }
