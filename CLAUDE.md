@@ -8,7 +8,10 @@ Kostenloses Immobilienportal „von privat“ (Verkauf, ohne Makler, ohne Provis
 
 - Läuft **im Demo-Modus** (Beispieldaten im Arbeitsspeicher). Mit gesetzten `VITE_SUPABASE_URL` und
   `VITE_SUPABASE_ANON_KEY` (siehe `.env.example`) spricht die Seite stattdessen Supabase an (`src/api/live.ts`).
-- **Es gibt noch kein Supabase-Projekt, keine Domain, kein GitHub-Repo, nichts ist veröffentlicht.**
+- **Demo live:** https://rianvegeta1991.github.io/freihaus/ (GitHub Pages, Workflow `.github/workflows/pages.yml`, Unterpfad
+  `/freihaus/` über `VITE_BASE`; `noindex`). Repo `rianvegeta1991/freihaus` ist **öffentlich** (Pages geht im Free-Tarif nur so) –
+  deshalb nie Schlüssel oder echte Personendaten einchecken. Tiefe Links liefert `404.html` (Status 404, App läuft trotzdem; für SEO ungeeignet).
+- **Es gibt noch kein Supabase-Projekt und keine eigene Domain.**
 - Rechtstexte (`src/pages/info.ts`) sind **Entwürfe mit Platzhaltern in [eckigen Klammern]** – nicht live schalten,
   bevor ein Anwalt sie geprüft hat und die echten Angaben drinstehen.
 
