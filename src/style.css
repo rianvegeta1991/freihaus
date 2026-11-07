@@ -31,6 +31,7 @@ h1 { font-size: clamp(1.7rem, 4.5vw, 2.5rem); }
 h2 { font-size: clamp(1.3rem, 3vw, 1.7rem); }
 h3 { font-size: 1.15rem; }
 p { margin: 0 0 1em; }
+h1, h2, h3, p, li, dd, label, .chip, .badge { overflow-wrap: break-word; hyphens: auto; }
 :focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; border-radius: 4px; }
 main:focus { outline: none; }
 
@@ -163,10 +164,12 @@ input[type='checkbox'] { width: 24px; min-height: 24px; height: 24px; flex: none
 .gal-thumb:hover, .gal-thumb:focus-visible { border-color: var(--blue); }
 .gal-thumb img { width: 96px; height: 64px; object-fit: cover; }
 .loc { color: var(--muted); font-size: 1.05rem; }
-.facts { display: grid; gap: 10px 16px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); margin: 16px 0; }
-.fact { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
-.fact dt { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
-.fact dd { margin: 2px 0 0; font-weight: 700; }
+/* min(100%, …) und min-width:0 verhindern, dass lange Wörter („Verbrauchsausweis“, „Energieeffizienzklasse“)
+   die Kästchen über den Rand drücken; hyphens trennt sauber, overflow-wrap fängt den Rest ab. */
+.facts { display: grid; gap: 10px 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 170px), 1fr)); margin: 16px 0; }
+.fact { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; min-width: 0; }
+.fact dt { font-size: 0.8rem; color: var(--muted); font-weight: 600; overflow-wrap: anywhere; hyphens: auto; }
+.fact dd { margin: 2px 0 0; font-weight: 700; overflow-wrap: anywhere; hyphens: auto; }
 .desc p { max-width: 70ch; }
 .energy-box { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin: 20px 0; }
 .price-box, .contact-box, .safety { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px; margin-bottom: 16px; }
