@@ -15,6 +15,12 @@ Kostenloses Immobilienportal „von privat“ (Verkauf, ohne Makler, ohne Provis
 - Rechtstexte (`src/pages/info.ts`) sind **Entwürfe mit Platzhaltern in [eckigen Klammern]** – nicht live schalten,
   bevor ein Anwalt sie geprüft hat und die echten Angaben drinstehen.
 
+## Betreiberangaben
+
+Auf der Seite und im Repo stehen **nur Name (Bastian Badde) und E-Mail (kontakt.freihaus@proton.me)** – zentral in `src/pages/info.ts`
+(`NAME`, `MAIL`). **Die Privatanschrift des Betreibers wird nie veröffentlicht** und gehört auch nicht ins (öffentliche) Repo.
+Das Impressum braucht vor dem echten Start trotzdem eine ladungsfähige Anschrift – dafür eine Geschäftsadresse (c/o) besorgen.
+
 ## Entwicklung
 
 - Node liegt portabel unter `C:\Users\Bastian\tools\node` (in Shells erst `$env:PATH` bzw. `export PATH` setzen).

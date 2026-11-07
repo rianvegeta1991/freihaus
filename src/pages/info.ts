@@ -2,6 +2,11 @@ import { h } from '../dom'
 import type { Route } from '../router'
 import { setTitle } from '../ui'
 
+// Betreiber: nur Name und E-Mail werden genannt. Die Privatanschrift wird bewusst NICHT veröffentlicht.
+const NAME = 'Bastian Badde'
+const MAIL = 'kontakt.freihaus@proton.me'
+const mail = () => h('a', { href: `mailto:${MAIL}` }, MAIL)
+
 const draft = (what: string) => h('div', { class: 'notice notice-warn', role: 'note' },
   h('strong', null, 'ENTWURF – noch nicht rechtsgeprüft. '), `${what} Diese Seite darf erst nach Prüfung durch eine Fachanwältin oder einen Fachanwalt für IT-Recht und mit den echten Angaben veröffentlicht werden. Mit [ECKIGEN KLAMMERN] markierte Stellen sind Platzhalter.`)
 
@@ -35,7 +40,7 @@ export async function renderTransparency(_r: Route): Promise<HTMLElement> {
   return page('Wer finanziert FreiHaus?',
     h('p', { class: 'lead' }, 'FreiHaus ist kostenlos – für alle, dauerhaft. Hier steht ehrlich, wie das geht.'),
     h('h2', null, 'Heute'),
-    h('p', null, 'FreiHaus wird von [NAME DES BETREIBERS] privat finanziert. Die laufenden Kosten (Server, E-Mail, Prüfung) liegen bei rund [BETRAG] € im Monat. Es gibt keine Werbung, keine Provision und keinen Datenverkauf.'),
+    h('p', null, `FreiHaus wird von ${NAME} privat finanziert. Die laufenden Kosten (Server, E-Mail, Prüfung) liegen bei rund [BETRAG] € im Monat. Es gibt keine Werbung, keine Provision und keinen Datenverkauf.`),
     h('h2', null, 'Was wir nie tun'),
     h('ul', null,
       h('li', null, 'Provisionen oder Erfolgsgebühren verlangen – weder von Verkäufern noch von Käufern.'),
@@ -51,7 +56,8 @@ export async function renderAbout(_r: Route): Promise<HTMLElement> {
   return page('Über FreiHaus',
     h('p', { class: 'lead' }, 'Eine Immobilie zu verkaufen sollte nicht Tausende Euro Provision kosten. Und ein Haus zu kaufen sollte so einfach sein, wie mit dem Besitzer zu sprechen – über den Gartenzaun.'),
     h('p', null, 'FreiHaus ist ein kostenloses Anzeigenportal. Wir bringen Verkäufer und Käufer zusammen, mehr nicht. Wir vermitteln nicht, wir wählen keine Interessenten aus, wir organisieren keine Besichtigungen und verdienen nicht am Abschluss. Das ist der Unterschied zu einem Makler.'),
-    h('p', null, '[HIER STEHT SPÄTER IHRE PERSÖNLICHE VORSTELLUNG MIT FOTO – das schafft Vertrauen.]'))
+    h('h2', null, 'Wer dahintersteht'),
+    h('p', null, `FreiHaus wird von ${NAME} betrieben. Fragen, Anregungen oder Hinweise schicken Sie gern per E-Mail an `, mail(), '.'))
 }
 
 export async function renderMod(_r: Route): Promise<HTMLElement> {
@@ -69,13 +75,13 @@ export async function renderMod(_r: Route): Promise<HTMLElement> {
     h('h2', null, 'Was passiert bei einem Verstoß?'),
     h('p', null, 'Wir geben das Inserat zur Überarbeitung zurück oder sperren es – bei Betrug auch das Konto. Sie erhalten immer eine Begründung in Ihrem Konto und per E-Mail und können widersprechen. Meldungen bearbeiten wir in der Regel innerhalb von 24 Stunden.'),
     h('h2', null, 'Inhalte melden'),
-    h('p', null, 'An jedem Inserat gibt es den Knopf „Inserat melden“. Für Behörden und Rückfragen erreichen Sie uns unter [KONTAKT-E-MAIL].'))
+    h('p', null, 'An jedem Inserat gibt es den Knopf „Inserat melden“. Für Behörden und Rückfragen erreichen Sie uns unter ', mail(), '.'))
 }
 
 export async function renderTerms(_r: Route): Promise<HTMLElement> {
   return page('Nutzungsbedingungen',
     draft('Inhaltlicher Rahmen für die anwaltliche Ausarbeitung.'),
-    h('h2', null, '1. Wer wir sind'), h('p', null, 'FreiHaus wird betrieben von [NAME, ANSCHRIFT]. Die Nutzung ist kostenlos.'),
+    h('h2', null, '1. Wer wir sind'), h('p', null, `FreiHaus wird betrieben von ${NAME} (Kontakt: `, mail(), '). Die Nutzung ist kostenlos.'),
     h('h2', null, '2. Was FreiHaus ist – und was nicht'),
     h('p', null, 'FreiHaus ist ein Anzeigenmedium. Wir vermitteln keine Verträge, weisen keine Interessenten nach, wählen keine Interessenten aus, organisieren keine Besichtigungen und erhalten keine Vergütung, die vom Abschluss eines Vertrages abhängt. Verträge kommen ausschließlich zwischen Verkäufer und Käufer zustande.'),
     h('h2', null, '3. Wer inserieren darf'), h('p', null, 'Nur Privatpersonen, die Eigentümer sind oder zum Verkauf berechtigt. Makler und gewerbliche Anbieter dürfen nicht inserieren.'),
@@ -90,7 +96,7 @@ export async function renderTerms(_r: Route): Promise<HTMLElement> {
 export async function renderPrivacy(_r: Route): Promise<HTMLElement> {
   return page('Datenschutzerklärung',
     draft('Gerüst mit den vorgesehenen Verarbeitungen – kein fertiger Text.'),
-    h('h2', null, 'Verantwortlicher'), h('p', null, '[NAME, ANSCHRIFT, E-MAIL]'),
+    h('h2', null, 'Verantwortlicher'), h('p', null, `${NAME}, E-Mail: `, mail(), ' [ANSCHRIFT: kommt als Geschäftsadresse, siehe Hinweis im Impressum]'),
     h('h2', null, 'Welche Daten wir verarbeiten und warum'),
     h('ul', null,
       h('li', null, h('strong', null, 'Konto: '), 'E-Mail-Adresse, optional Name und Telefonnummer – zur Anmeldung und Nutzung (Vertragserfüllung, Art. 6 Abs. 1 lit. b DSGVO).'),
@@ -101,24 +107,24 @@ export async function renderPrivacy(_r: Route): Promise<HTMLElement> {
       h('li', null, h('strong', null, 'Reichweitenmessung: '), '[ANBIETER, z. B. Plausible/Matomo – ohne Cookies, ohne Personenbezug – ANWALT PRÜFT].')),
     h('h2', null, 'Empfänger / Auftragsverarbeiter'), h('p', null, '[Supabase (Hosting/Datenbank, Region Frankfurt), Cloudflare (Auslieferung/Bot-Schutz), E-Mail-Dienstleister – jeweils mit Auftragsverarbeitungsvertrag].'),
     h('h2', null, 'Speicherdauer'), h('p', null, 'Inserate: 90 Tage Laufzeit, danach 30 Tage Verlängerungsfenster, dann Löschung. Konto: bis zur Löschung durch Sie. Meldungen und Begründungen: [3 Jahre]. Zugriffsprotokolle: [7–14 Tage].'),
-    h('h2', null, 'Ihre Rechte'), h('p', null, 'Auskunft, Berichtigung, Löschung, Einschränkung, Übertragbarkeit, Widerspruch und Beschwerde bei der Aufsichtsbehörde. [KONTAKT]'),
+    h('h2', null, 'Ihre Rechte'), h('p', null, 'Auskunft, Berichtigung, Löschung, Einschränkung, Übertragbarkeit, Widerspruch und Beschwerde bei der Aufsichtsbehörde. Wenden Sie sich dafür an ', mail(), '.'),
     h('h2', null, 'Cookies'), h('p', null, 'FreiHaus setzt nur technisch notwendige Speicherungen (z. B. Anmeldung). Es gibt keine Werbe- oder Tracking-Cookies, deshalb keinen Cookie-Banner. Schriften liegen auf unserem Server.'))
 }
 
 export async function renderImprint(_r: Route): Promise<HTMLElement> {
   return page('Impressum',
-    draft('Pflichtangaben nach § 5 DDG – nur mit echten Daten ausfüllen.'),
-    h('p', null, '[VOR- UND NACHNAME]', h('br'), '[LADUNGSFÄHIGE ANSCHRIFT – kein Postfach]'),
-    h('p', null, 'E-Mail: [E-MAIL-ADRESSE]', h('br'), 'Zweiter Kontaktweg: [TELEFON ODER KONTAKTFORMULAR]'),
+    draft('Pflichtangaben nach § 5 DDG. Es fehlt noch eine ladungsfähige Anschrift (Geschäftsadresse); ohne sie ist ein Impressum nicht vollständig.'),
+    h('p', null, NAME, h('br'), '[ANSCHRIFT – Geschäftsadresse, noch festzulegen; kein Postfach]'),
+    h('p', null, 'E-Mail: ', mail(), h('br'), 'Zweiter Kontaktweg: [Kontaktformular – noch einzurichten]'),
     h('p', null, '[Gewerbe: angemeldet bei … / Umsatzsteuer: Kleinunternehmerregelung § 19 UStG – nur eintragen, wenn zutreffend]'),
-    h('p', null, 'Kontaktstelle für Behörden und Nutzer nach Digital Services Act (Art. 11, 12): [E-MAIL-ADRESSE], Sprache: Deutsch.'))
+    h('p', null, 'Kontaktstelle für Behörden und Nutzer nach Digital Services Act (Art. 11, 12): ', mail(), ', Sprache: Deutsch.'))
 }
 
 export async function renderA11y(_r: Route): Promise<HTMLElement> {
   return page('Barrierefreiheit',
     draft('Bitte mit dem tatsächlichen Prüfstand ergänzen.'),
     h('p', null, 'Wir möchten, dass alle FreiHaus nutzen können, und richten uns nach den Web Content Accessibility Guidelines (WCAG 2.1, Stufe AA). Dazu gehören gut lesbare Schrift, ausreichende Kontraste, Bedienung per Tastatur und Zuordnung aller Formularfelder. Status werden nie allein über Farbe angezeigt.'),
-    h('p', null, 'Stand der Prüfung: [DATUM / ERGEBNIS]. Barrieren melden Sie bitte an [E-MAIL-ADRESSE].'))
+    h('p', null, 'Stand der Prüfung: [DATUM / ERGEBNIS]. Barrieren melden Sie bitte an ', mail(), '.'))
 }
 
 export async function renderNotFound(_r: Route): Promise<HTMLElement> {
