@@ -109,6 +109,18 @@ export interface Report {
   state: 'offen' | 'entschieden'
 }
 
+export type ContactTopic = 'frage' | 'hinweis' | 'datenschutz' | 'sonstiges'
+
+/** Nachricht aus dem allgemeinen Kontaktformular (nicht zu einem Inserat). */
+export interface ContactMessage {
+  id: string
+  name: string
+  email: string
+  topic: ContactTopic
+  body: string
+  createdAt: string
+}
+
 export interface ContactInfo {
   mode: ContactMode
   email: string | null
@@ -153,8 +165,11 @@ export interface Api {
 
   report(r: { listingId: string; reason: ReportReason; details: string; name: string; email: string }): Promise<void>
   moderationLog(): Promise<ModerationEntry[]>
+  /** Allgemeines Kontaktformular – auch ohne Konto. */
+  sendContact(c: { name: string; email: string; topic: ContactTopic; body: string }): Promise<void>
 
-  adminQueue(): Promise<{ pending: Listing[]; reports: Report[] }>
+  adminQueue(): Promise<{ pending: Listing[]; reports: Report[]; contacts: ContactMessage[] }>
+  closeContact(id: string): Promise<void>
   moderate(p: { listingId: string; action: ModerationAction; reasonCode: string; reasonText: string; reportId?: string }): Promise<void>
   stats(): Promise<{ published: number }>
 }

@@ -96,7 +96,7 @@ export async function renderTerms(_r: Route): Promise<HTMLElement> {
 export async function renderPrivacy(_r: Route): Promise<HTMLElement> {
   return page('Datenschutzerklärung',
     draft('Gerüst mit den vorgesehenen Verarbeitungen – kein fertiger Text.'),
-    h('h2', null, 'Verantwortlicher'), h('p', null, `${NAME}, E-Mail: `, mail(), ' [ANSCHRIFT: kommt als Geschäftsadresse, siehe Hinweis im Impressum]'),
+    h('h2', null, 'Verantwortlicher'), h('p', null, `${NAME}, E-Mail: `, mail(), ', Kontaktformular: ', h('a', { href: '/kontakt' }, 'Kontakt')),
     h('h2', null, 'Welche Daten wir verarbeiten und warum'),
     h('ul', null,
       h('li', null, h('strong', null, 'Konto: '), 'E-Mail-Adresse, optional Name und Telefonnummer – zur Anmeldung und Nutzung (Vertragserfüllung, Art. 6 Abs. 1 lit. b DSGVO).'),
@@ -104,7 +104,8 @@ export async function renderPrivacy(_r: Route): Promise<HTMLElement> {
       h('li', null, h('strong', null, 'Nachrichten: '), 'Inhalt und Zeitpunkt, zur Weiterleitung an den Inserenten.'),
       h('li', null, h('strong', null, 'Meldungen: '), 'Inhalt, ggf. Name und E-Mail des Meldenden (rechtliche Verpflichtung nach dem Digital Services Act).'),
       h('li', null, h('strong', null, 'Sicherheit: '), 'Zugriffsprotokolle, Zähler für Kontaktaufrufe und Nachrichten (berechtigtes Interesse, Betrugs- und Spam-Abwehr).'),
-      h('li', null, h('strong', null, 'Reichweitenmessung: '), '[ANBIETER, z. B. Plausible/Matomo – ohne Cookies, ohne Personenbezug – ANWALT PRÜFT].')),
+      h('li', null, h('strong', null, 'Kontaktformular: '), 'Name, E-Mail-Adresse und Nachricht, nur um Ihnen zu antworten (Art. 6 Abs. 1 lit. b bzw. f DSGVO). Zur Spam-Abwehr zählen wir die Nachrichten je Adresse; eine IP-Adresse speichern wir dafür nicht.'),
+      h('li', null, h('strong', null, 'Reichweitenmessung: '), 'Keine. Wir messen keine Besucherzahlen und setzen keine Statistik- oder Tracking-Dienste ein.')),
     h('h2', null, 'Empfänger / Auftragsverarbeiter'), h('p', null, '[Supabase (Hosting/Datenbank, Region Frankfurt), Cloudflare (Auslieferung/Bot-Schutz), E-Mail-Dienstleister – jeweils mit Auftragsverarbeitungsvertrag].'),
     h('h2', null, 'Speicherdauer'), h('p', null, 'Inserate: 90 Tage Laufzeit, danach 30 Tage Verlängerungsfenster, dann Löschung. Konto: bis zur Löschung durch Sie. Meldungen und Begründungen: [3 Jahre]. Zugriffsprotokolle: [7–14 Tage].'),
     h('h2', null, 'Ihre Rechte'), h('p', null, 'Auskunft, Berichtigung, Löschung, Einschränkung, Übertragbarkeit, Widerspruch und Beschwerde bei der Aufsichtsbehörde. Wenden Sie sich dafür an ', mail(), '.'),
@@ -113,10 +114,9 @@ export async function renderPrivacy(_r: Route): Promise<HTMLElement> {
 
 export async function renderImprint(_r: Route): Promise<HTMLElement> {
   return page('Impressum',
-    draft('Pflichtangaben nach § 5 DDG. Es fehlt noch eine ladungsfähige Anschrift (Geschäftsadresse); ohne sie ist ein Impressum nicht vollständig.'),
-    h('p', null, NAME, h('br'), '[ANSCHRIFT – Geschäftsadresse, noch festzulegen; kein Postfach]'),
-    h('p', null, 'E-Mail: ', mail(), h('br'), 'Zweiter Kontaktweg: [Kontaktformular – noch einzurichten]'),
-    h('p', null, '[Gewerbe: angemeldet bei … / Umsatzsteuer: Kleinunternehmerregelung § 19 UStG – nur eintragen, wenn zutreffend]'),
+    draft('Pflichtangaben nach § 5 DDG. Eine ladungsfähige Anschrift ist hier bewusst nicht angegeben; für einen echten Betrieb schreibt das Gesetz sie vor, ohne sie ist das Impressum nicht vollständig.'),
+    h('p', null, NAME),
+    h('p', null, 'E-Mail: ', mail(), h('br'), 'Zweiter Kontaktweg: ', h('a', { href: '/kontakt' }, 'Kontaktformular')),
     h('p', null, 'Kontaktstelle für Behörden und Nutzer nach Digital Services Act (Art. 11, 12): ', mail(), ', Sprache: Deutsch.'))
 }
 

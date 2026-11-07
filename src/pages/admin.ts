@@ -2,7 +2,8 @@ import { api } from '../api'
 import { h, clear } from '../dom'
 import { fmtDate, fmtEur, TYPE_LABEL } from '../format'
 import { navigate, type Route } from '../router'
-import type { Listing, ModerationAction, Report } from '../types'
+import type { ContactMessage, Listing, ModerationAction, Report } from '../types'
+import { TOPICS } from './kontakt'
 import { errMsg, field, openModal, session, setTitle, spinner, toast } from '../ui'
 
 const REASON_CODES: [string, string][] = [
@@ -20,11 +21,12 @@ export async function renderAdmin(r: Route): Promise<HTMLElement> {
 
   async function load(): Promise<void> {
     try {
-      const { pending, reports } = await api.adminQueue()
+      const { pending, reports, contacts } = await api.adminQueue()
       clear(root)
       root.append(h('h1', null, 'Moderation'),
         h('section', null, h('h2', null, `Zur Prüfung (${pending.length})`), pending.length ? pending.map(pendingRow) : h('p', { class: 'empty' }, 'Nichts zu prüfen. 🎉')),
         h('section', null, h('h2', null, `Offene Meldungen (${reports.length})`), reports.length ? reports.map(reportRow) : h('p', { class: 'empty' }, 'Keine offenen Meldungen.')),
+        h('section', null, h('h2', null, `Kontaktnachrichten (${contacts.length})`), contacts.length ? contacts.map(contactRow) : h('p', { class: 'empty' }, 'Keine offenen Nachrichten.')),
         h('p', { class: 'hint' }, 'Ziel: Meldungen innerhalb von 24 Stunden entscheiden. Jede Sperre braucht eine Begründung – die sieht der Inserent in seinem Konto (DSA Art. 17).'))
     } catch (e) { clear(root); root.append(h('p', { class: 'err' }, errMsg(e))) }
   }
@@ -70,6 +72,18 @@ export async function renderAdmin(r: Route): Promise<HTMLElement> {
       h('div', { class: 'my-actions' },
         h('button', { class: 'btn btn-secondary', type: 'button', onClick: () => decide({ id: x.listingId, title: x.listingTitle }, 'sperren', x.id) }, 'Inserat sperren'),
         h('button', { class: 'btn btn-ghost', type: 'button', onClick: () => decide({ id: x.listingId, title: x.listingTitle }, 'freigeben', x.id) }, 'Unbegründet – abweisen')))
+  }
+
+  function contactRow(x: ContactMessage): HTMLElement {
+    return h('article', { class: 'my-row' },
+      h('div', { class: 'my-main' },
+        h('h3', null, `${x.name} – ${TOPICS.find(([v]) => v === x.topic)?.[1] ?? x.topic}`),
+        h('p', { class: 'meta' }, h('a', { href: `mailto:${x.email}` }, x.email), ` · ${fmtDate(x.createdAt)}`),
+        h('p', { class: 'pre' }, x.body)),
+      h('div', { class: 'my-actions' },
+        h('button', { class: 'btn btn-secondary', type: 'button', onClick: async () => {
+          try { await api.closeContact(x.id); toast('Als erledigt markiert.'); await load() } catch (er) { toast(errMsg(er), 'fehler') }
+        } }, 'Erledigt')))
   }
 
   void load()

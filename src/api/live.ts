@@ -4,7 +4,7 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { withBase } from '../router'
 import type {
-  Api, ContactInfo, Listing, ListingInput, ListingStatus, Message, ModerationEntry, Photo, Report, SearchFilter, User,
+  Api, ContactInfo, ContactMessage, Listing, ListingInput, ListingStatus, Message, ModerationEntry, Photo, Report, SearchFilter, User,
 } from '../types'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -228,7 +228,21 @@ export function createLiveApi(url: string, anonKey: string): Api {
       const reports: Report[] = (r ?? []).map((x: Row) => ({
         id: x.id, listingId: x.listing_id, listingTitle: x.listings?.title ?? '', reason: x.reason, details: x.details, reporterEmail: x.reporter_email ?? undefined, createdAt: x.created_at, state: x.state,
       }))
-      return { pending: (l ?? []).map(toListing), reports }
+      const { data: c, error: e3 } = await sb.from('contact_messages').select('*').eq('state', 'offen').order('created_at')
+      fail(e3)
+      const contacts: ContactMessage[] = (c ?? []).map((x: Row) => ({
+        id: x.id, name: x.name, email: x.email, topic: x.topic, body: x.body, createdAt: x.created_at,
+      }))
+      return { pending: (l ?? []).map(toListing), reports, contacts }
+    },
+    async sendContact(c) {
+      const { error } = await sb.from('contact_messages').insert({ name: c.name.trim(), email: c.email.trim(), topic: c.topic, body: c.body.trim() })
+      fail(error)
+    },
+    async closeContact(id) {
+      const u = await currentUser()
+      const { error } = await sb.from('contact_messages').update({ state: 'entschieden', decided_at: new Date().toISOString(), decided_by: u?.id ?? null }).eq('id', id)
+      fail(error)
     },
     async moderate(p) {
       const { error } = await sb.rpc('moderate_listing', {

@@ -2,7 +2,7 @@
 // bevor ein Supabase-Projekt existiert. Verhält sich wie die echte Datenbank (Prüfung, Vertrauensstufe,
 // Fotopflicht), ist aber KEIN Ersatz für deren Sicherheitsregeln – die liegen in supabase/migrations.
 import type {
-  Api, ContactInfo, Listing, ListingInput, ListingStatus, Message, ModerationAction, ModerationEntry,
+  Api, ContactInfo, ContactMessage, Listing, ListingInput, ListingStatus, Message, ModerationAction, ModerationEntry,
   Photo, Report, SearchFilter, User,
 } from '../types'
 import { hasErrors, validateListing } from '../validation'
@@ -53,6 +53,7 @@ export function createDemoApi(): Api {
   let rows: Row[] = seed()
   const msgs: MsgRow[] = []
   const reports: (Report & { listingTitle: string })[] = []
+  const contacts: ContactMessage[] = []
   const log: ModerationEntry[] = []
   const savedIds = new Set<string>()
   const contactViews: number[] = []
@@ -213,10 +214,23 @@ export function createDemoApi(): Api {
       reports.push({ id: uid(), listingId: r.listingId, listingTitle: l.title, reason: r.reason, details: r.details.trim(), reporterEmail: r.email.trim() || undefined, createdAt: new Date().toISOString(), state: 'offen' })
     },
     async moderationLog() { const u = need(); return log.filter((l) => rows.find((r) => r.id === l.listingId)?.ownerId === u.id) },
+    async sendContact(c) {
+      const email = c.email.trim().toLowerCase()
+      if (!c.name.trim()) throw new Error('Bitte geben Sie Ihren Namen an.')
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new Error('Bitte geben Sie eine gültige E-Mail-Adresse an.')
+      if (c.body.trim().length < 10) throw new Error('Bitte schreiben Sie mindestens 10 Zeichen.')
+      if (contacts.filter((m) => m.email === email).length >= 3) throw new Error('rate_limited: Von dieser Adresse sind heute schon mehrere Nachrichten eingegangen. Bitte versuchen Sie es morgen erneut.')
+      contacts.push({ id: uid(), name: c.name.trim(), email, topic: c.topic, body: c.body.trim(), createdAt: new Date().toISOString() })
+    },
 
     async adminQueue() {
       if (!user?.isAdmin) throw new Error('forbidden: Nur für Moderatoren.')
-      return { pending: rows.filter((r) => r.status === 'pending').map(toPublic), reports: reports.filter((r) => r.state === 'offen') }
+      return { pending: rows.filter((r) => r.status === 'pending').map(toPublic), reports: reports.filter((r) => r.state === 'offen'), contacts: [...contacts] }
+    },
+    async closeContact(id) {
+      if (!user?.isAdmin) throw new Error('forbidden: Nur für Moderatoren.')
+      const i = contacts.findIndex((m) => m.id === id)
+      if (i >= 0) contacts.splice(i, 1)
     },
     async moderate(p) {
       if (!user?.isAdmin) throw new Error('forbidden: Nur für Moderatoren.')

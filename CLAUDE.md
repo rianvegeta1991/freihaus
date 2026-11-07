@@ -21,6 +21,15 @@ Auf der Seite und im Repo stehen **nur Name (Bastian Badde) und die Portal-Adres
 (`NAME`, `MAIL`). **Die Privatanschrift des Betreibers wird nie veröffentlicht** und gehört auch nicht ins (öffentliche) Repo.
 Das Impressum braucht vor dem echten Start trotzdem eine ladungsfähige Anschrift – dafür eine Geschäftsadresse (c/o) besorgen.
 
+**Entscheidung vom 8.11.2026:** Anschrift, Gewerbe und Steuernummer stehen **bewusst nicht** im Impressum (Bastian wollte sie
+streichen). § 5 DDG verlangt für ein geschäftsmäßiges Angebot trotzdem eine ladungsfähige Anschrift – das Impressum bleibt
+deshalb als **Entwurf** gekennzeichnet; vor einem echten Start mit Anwalt klären (Geschäftsadresse oder anderer Weg).
+Reichweitenmessung: **keine** (kein Anbieter, kein Cookie-Banner); die DSA-Nutzerzahl kommt später aus der Datenbank.
+Zweiter Kontaktweg ist das **Kontaktformular** `/kontakt` (`src/pages/kontakt.ts`, Migration `0003_contact.sql`):
+Honeypot + 3-Sekunden-Sperre im Browser, in der Datenbank max. 3 Nachrichten/Adresse/Tag und 40/Stunde gesamt, keine IP-Speicherung;
+Nachrichten erscheinen in der Moderation unter „Kontaktnachrichten“. Es gibt **keine E-Mail-Benachrichtigung** – die Moderation muss
+dort nachsehen (Punkt 3 der offenen Punkte).
+
 ## Entwicklung
 
 - Node liegt portabel unter `C:\Users\Bastian\tools\node` (in Shells erst `$env:PATH` bzw. `export PATH` setzen).
@@ -51,7 +60,7 @@ Das Impressum braucht vor dem echten Start trotzdem eine ladungsfähige Anschrif
 
 ## Offene Punkte (Reihenfolge ungefähr nach Wichtigkeit)
 
-1. Supabase-Projekt (Region Frankfurt), Migrationen einspielen, `live.ts` erstmals gegen echtes Backend testen.
+1. Supabase-Projekt (Region Frankfurt), Migrationen **0001, 0002 und 0003** einspielen, `live.ts` erstmals gegen echtes Backend testen.
 2. Anmeldung: Supabase-Auth-E-Mail-Vorlagen (Deutsch), Redirect-URLs; **SMS-Bestätigung** (Telefon) und Turnstile fehlen.
 3. E-Mail-Benachrichtigung bei neuen Nachrichten (Edge Function) – bisher nur Posteingang im Konto.
 4. Auto-Ablauf nach 90 Tagen (`pg_cron`: `published` → `expired`, 30 Tage später löschen), Verlängerungsmail.

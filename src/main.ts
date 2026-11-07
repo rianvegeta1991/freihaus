@@ -8,6 +8,7 @@ import { session } from './ui'
 import { renderAccount } from './pages/account'
 import { renderAdmin } from './pages/admin'
 import { renderHome } from './pages/home'
+import { renderKontakt } from './pages/kontakt'
 import { renderA11y, renderAbout, renderImprint, renderMod, renderNotFound, renderPrivacy, renderSafety, renderTerms, renderTransparency } from './pages/info'
 import { renderListing } from './pages/listing'
 import { renderLogin } from './pages/login'
@@ -45,7 +46,7 @@ function drawFooter(): void {
   footer.append(h('div', { class: 'wrap foot' },
     h('div', null, h('strong', null, 'FreiHaus'), h('p', null, 'Häuser und Wohnungen direkt vom Eigentümer. Kostenlos, ohne Provision.')),
     h('nav', { 'aria-label': 'Informationen' },
-      h('a', { href: '/ueber' }, 'Über uns'), h('a', { href: '/transparenz' }, 'Wer finanziert uns?'), h('a', { href: '/sicherheit' }, 'Betrug erkennen'), h('a', { href: '/moderation' }, 'So moderieren wir')),
+      h('a', { href: '/ueber' }, 'Über uns'), h('a', { href: '/transparenz' }, 'Wer finanziert uns?'), h('a', { href: '/sicherheit' }, 'Betrug erkennen'), h('a', { href: '/moderation' }, 'So moderieren wir'), h('a', { href: '/kontakt' }, 'Kontakt')),
     h('nav', { 'aria-label': 'Rechtliches' },
       h('a', { href: '/impressum' }, 'Impressum'), h('a', { href: '/datenschutz' }, 'Datenschutz'), h('a', { href: '/nutzungsbedingungen' }, 'Nutzungsbedingungen'), h('a', { href: '/barrierefreiheit' }, 'Barrierefreiheit'))))
 }
@@ -89,6 +90,7 @@ async function start(): Promise<void> {
   route('/moderation', mount(renderMod))
   route('/nutzungsbedingungen', mount(renderTerms))
   route('/datenschutz', mount(renderPrivacy))
+  route('/kontakt', mount(renderKontakt))
   route('/impressum', mount(renderImprint))
   route('/barrierefreiheit', mount(renderA11y))
   setNotFound(mount(renderNotFound))

@@ -59,6 +59,8 @@ main:focus { outline: none; }
 .nav { display: flex; align-items: center; gap: 4px 18px; flex-wrap: wrap; }
 .nav a { color: var(--text); text-decoration: none; font-weight: 600; padding: 10px 2px; min-height: 44px; display: inline-flex; align-items: center; }
 .nav a:hover { color: var(--blue); text-decoration: underline; }
+.pre { white-space: pre-wrap; }
+.falle { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 .nav .btn { padding: 8px 16px; }
 .nav a.btn-secondary, .nav a.btn-secondary:hover { color: #fff; text-decoration: none; }
 .nav a.btn-secondary { padding: 8px 16px; }

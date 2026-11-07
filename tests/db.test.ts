@@ -6,6 +6,8 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 const MIGRATION = readFileSync(new URL('../supabase/migrations/0001_schema.sql', import.meta.url), 'utf8')
 
+const CONTACT = readFileSync(new URL('../supabase/migrations/0003_contact.sql', import.meta.url), 'utf8')
+
 const BOOT = `
   create role anon nologin; create role authenticated nologin; create role service_role nologin;
   create schema auth;
@@ -66,6 +68,7 @@ beforeEach(async () => {
   db = new PGlite()
   await db.exec(BOOT)
   await db.exec(MIGRATION)
+  await db.exec(CONTACT)
   await db.exec(`insert into auth.users (id, email) values ('${U1}', 'a@x.de'), ('${U2}', 'b@x.de'), ('${ADM}', 'm@x.de')`)
   await db.exec(`update profiles set role = 'admin' where id = '${ADM}'`)
 })
@@ -289,6 +292,46 @@ describe('Nachrichten', () => {
     await as(U2)
     for (let i = 0; i < 10; i++) await db.query(`insert into messages (listing_id, sender_id, body) values ($1, $2, 'Nachricht Nummer ${i} an Sie.')`, [pub, U2])
     expect(await fehler(() => db.query(`insert into messages (listing_id, sender_id, body) values ($1, $2, 'Eine elfte Nachricht an Sie.')`, [pub, U2]))).toMatch(/rate_limited/)
+  })
+})
+
+describe('Kontaktformular', () => {
+  const ins = (mail = 'frage@x.de', body = 'Wie funktioniert die Freigabe eines Inserats?') =>
+    db.query(`insert into contact_messages (name, email, topic, body) values ('Eva', $1, 'frage', $2)`, [mail, body])
+
+  it('Besucher ohne Konto können schreiben, aber nichts lesen; Moderation liest', async () => {
+    await as(null)
+    await ins()
+    expect(await fehler(() => db.query(`select * from contact_messages`))).toMatch(/permission denied/)
+    await as(U2)
+    expect((await db.query(`select * from contact_messages`)).rows).toHaveLength(0)
+    await as(ADM)
+    const rows = (await db.query<{ email: string }>(`select email from contact_messages`)).rows
+    expect(rows).toHaveLength(1)
+    expect(rows[0].email).toBe('frage@x.de')
+  })
+  it('prüft Adresse und Länge, setzt Status nur auf „offen“', async () => {
+    await as(null)
+    expect(await fehler(() => ins('keine-adresse'))).toMatch(/violates check/)
+    expect(await fehler(() => ins('a@x.de', 'kurz'))).toMatch(/violates check/)
+    expect(await fehler(() => ins('a@x.de', 'x'.repeat(3001)))).toMatch(/violates check/)
+    expect(await fehler(() => db.query(`insert into contact_messages (name, email, body, state) values ('E', 'a@x.de', 'Eine ausreichend lange Nachricht.', 'entschieden')`))).toMatch(/row-level security/)
+  })
+  it('bremst Absender nach drei Nachrichten am Tag und die Gesamtflut pro Stunde', async () => {
+    await as(null)
+    for (let i = 0; i < 3; i++) await ins('viel@x.de')
+    expect(await fehler(() => ins('VIEL@x.de'))).toMatch(/rate_limited/)
+    for (let i = 0; i < 37; i++) await ins(`m${i}@x.de`)
+    expect(await fehler(() => ins('neu@x.de'))).toMatch(/rate_limited/)
+  })
+  it('nur die Moderation darf eine Nachricht erledigen', async () => {
+    await as(null); await ins()
+    await as(U2)
+    await db.query(`update contact_messages set state = 'entschieden'`)
+    expect((await db.query(`select * from contact_messages`)).rows).toHaveLength(0)
+    await as(ADM)
+    await db.query(`update contact_messages set state = 'entschieden', decided_at = now(), decided_by = $1`, [ADM])
+    expect((await db.query<{ state: string }>(`select state from contact_messages`)).rows[0].state).toBe('entschieden')
   })
 })
 
