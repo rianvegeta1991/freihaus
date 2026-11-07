@@ -1,0 +1,26 @@
+{
+  "name": "freihaus",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "FreiHaus - kostenloses Immobilienportal von privat, ohne Provision",
+  "scripts": {
+    "dev": "vite --host --port 8802 --strictPort",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host --port 8803 --strictPort",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@fontsource-variable/inter": "^5.3.0",
+    "@supabase/supabase-js": "^2.119.0"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.15",
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.6",
+    "vitest": "^5.1.0"
+  }
+}
