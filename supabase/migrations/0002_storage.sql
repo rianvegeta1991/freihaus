@@ -1,5 +1,5 @@
 -- FreiHaus – Bildspeicher (Supabase Storage)
--- Hinweis: Diese Datei ist NICHT lokal getestet (die Test-Datenbank hat kein Storage-Schema).
+-- Hinweis: Nicht lokal testbar (die Test-Datenbank hat kein Storage-Schema), aber im echten Projekt geprüft: Hochladen geht; Löschen braucht zusätzlich 0005.
 -- Nach dem Einspielen im echten Projekt prüfen: Fremde Nutzer dürfen nicht in fremde Ordner schreiben.
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
