@@ -11,7 +11,7 @@ Kostenloses Immobilienportal „von privat“ (Kauf und Miete, ohne Makler, ohne
 - **Demo live:** https://rianvegeta1991.github.io/freihaus/ (GitHub Pages, Workflow `.github/workflows/pages.yml`, Unterpfad
   `/freihaus/` über `VITE_BASE`; `noindex`). Repo `rianvegeta1991/freihaus` ist **öffentlich** (Pages geht im Free-Tarif nur so) –
   deshalb nie Schlüssel oder echte Personendaten einchecken. Tiefe Links liefert `404.html` (Status 404, App läuft trotzdem; für SEO ungeeignet).
-- **Supabase-Projekt `fzhaozatyraflbwdspgd` (Frankfurt) läuft**, Migrationen 0001–0004 sind eingespielt (0004 Miete am 8.11.2026, live getestet), **0005 (Speicher: SELECT-Regel) noch NICHT**, `kontakt.freihaus@proton.me` ist `admin`.
+- **Supabase-Projekt `fzhaozatyraflbwdspgd` (Frankfurt) läuft**, Migrationen 0001–0005 sind eingespielt (0004 Miete und 0005 Speicher-SELECT-Regel am 8.11.2026, beide live getestet), `kontakt.freihaus@proton.me` ist `admin`.
   Lokal per `.env.local` (git-ignoriert) angebunden; die **GitHub-Pages-Demo bleibt im Demo-Modus**, bis URL/Key als Actions-Secrets eingetragen sind.
   **Gewählte Domain: `freihaus-immoportal.de`** (laut DNS-Prüfung am 8.11.2026 wahrscheinlich frei, noch nicht gekauft). Der eingebaute Supabase-Mailversand erlaubt nur wenige Anmelde-Mails pro Stunde („email rate limit exceeded") –
   vor dem Start eigenen SMTP-Dienst anbinden und die Auth-Mails eindeutschen.
@@ -21,7 +21,8 @@ Kostenloses Immobilienportal „von privat“ (Kauf und Miete, ohne Makler, ohne
   alle sensiblen Tabellen für Anon gesperrt – **alles bestanden**. **Nicht getestet:** erneutes Anmelden (Mail-Limit), Nachricht an Inserenten,
   `reveal_contact`, Merkliste, Zugriff eines zweiten, nicht-admin Kontos, Löschen mit Speicher-Aufräumen (neu, siehe unten).
   Fund 1: `deleteListing` ließ Fotodateien liegen (nur die Zeilen gingen per Cascade) – `live.ts` räumt sie jetzt mit ab.
-  Fund 2 (live geprüft): `storage.remove()` löscht trotzdem nichts und meldet keinen Fehler, weil auf `storage.objects` die SELECT-Regel für den eigenen Ordner fehlt → Migration `0005_storage_select.sql`. **Nach dem Einspielen erneut prüfen**: Entwurf mit Foto anlegen, löschen, Foto-URL muss 400 liefern.
+  Fund 2 (behoben, live bestätigt): `storage.remove()` löschte nichts und meldete keinen Fehler, weil auf `storage.objects` die SELECT-Regel für den eigenen Ordner fehlte → `0005_storage_select.sql`.
+  Seitdem verschwindet das Foto beim Löschen eines Entwurfs; die Bild-Adresse liefert danach noch ca. 1–2 Minuten 200 (CDN-Zwischenspeicher), dann 400.
   Test-Inserat und Test-Kontaktnachricht sind wieder gelöscht (Datenbank und Speicher geprüft, 8.11.2026). Der Foto-Bucket ist public:
   wer die URL kennt, sieht ein Foto auch bei Entwürfen und gesperrten Inseraten – in der Datenschutzerklärung erwähnen.
 - Rechtstexte (`src/pages/info.ts`) sind **Entwürfe mit Platzhaltern in [eckigen Klammern]** – nicht live schalten,
