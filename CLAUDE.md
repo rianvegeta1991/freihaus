@@ -11,7 +11,17 @@ Kostenloses Immobilienportal „von privat“ (Verkauf, ohne Makler, ohne Provis
 - **Demo live:** https://rianvegeta1991.github.io/freihaus/ (GitHub Pages, Workflow `.github/workflows/pages.yml`, Unterpfad
   `/freihaus/` über `VITE_BASE`; `noindex`). Repo `rianvegeta1991/freihaus` ist **öffentlich** (Pages geht im Free-Tarif nur so) –
   deshalb nie Schlüssel oder echte Personendaten einchecken. Tiefe Links liefert `404.html` (Status 404, App läuft trotzdem; für SEO ungeeignet).
-- **Es gibt noch kein Supabase-Projekt und keine eigene Domain.**
+- **Supabase-Projekt `fzhaozatyraflbwdspgd` (Frankfurt) läuft**, Migrationen 0001–0003 sind eingespielt, `kontakt.freihaus@proton.me` ist `admin`.
+  Lokal per `.env.local` (git-ignoriert) angebunden; die **GitHub-Pages-Demo bleibt im Demo-Modus**, bis URL/Key als Actions-Secrets eingetragen sind.
+  **Keine eigene Domain.** Der eingebaute Supabase-Mailversand erlaubt nur wenige Anmelde-Mails pro Stunde („email rate limit exceeded") –
+  vor dem Start eigenen SMTP-Dienst anbinden und die Auth-Mails eindeutschen.
+- **Live-Test gegen echtes Backend (8.11.2026, in Chrome per Erweiterung):** Konto speichern, Inserat anlegen (6 Schritte, 3 Fotos → Speicher
+  `<uid>/<inserat>/<id>.webp`, öffentlich lesbar), Moderation freigeben, Suche, Hausnummer nicht öffentlich (`listing_private` für Anon gesperrt, 42501),
+  Melden → Moderation, Sperren ohne Begründung abgelehnt / mit Begründung im Konto sichtbar, Kontaktnachricht „Erledigt", Abmelden (`/admin` → `/anmelden`),
+  alle sensiblen Tabellen für Anon gesperrt – **alles bestanden**. **Nicht getestet:** erneutes Anmelden (Mail-Limit), Nachricht an Inserenten,
+  `reveal_contact`, Merkliste, Zugriff eines zweiten, nicht-admin Kontos, Löschen mit Speicher-Aufräumen (neu, siehe unten).
+  Fund: `deleteListing` ließ die Fotodateien im Speicher liegen (nur die Zeilen gingen per Cascade) – seit 8.11. räumt `live.ts` sie mit ab.
+  Ein gesperrtes Test-Inserat („Testhaus mit Garten in Leipzig-Gohlis") liegt noch in der Datenbank samt 3 Fotos; Entwürfe sind Foto-URL-seitig öffentlich lesbar (Bucket ist public).
 - Rechtstexte (`src/pages/info.ts`) sind **Entwürfe mit Platzhaltern in [eckigen Klammern]** – nicht live schalten,
   bevor ein Anwalt sie geprüft hat und die echten Angaben drinstehen.
 
@@ -66,7 +76,7 @@ Neue Seiten müssen die Überschriftenfolge einhalten (`listingCard(l, 2)` direk
 
 ## Offene Punkte (Reihenfolge ungefähr nach Wichtigkeit)
 
-1. Supabase-Projekt (Region Frankfurt), Migrationen **0001, 0002 und 0003** einspielen, `live.ts` erstmals gegen echtes Backend testen.
+1. ~~Supabase-Projekt einrichten, Migrationen einspielen, `live.ts` testen~~ – erledigt (siehe „Stand"); offen: Test mit zweitem Konto, Anmelde-Wiederholung.
 2. Anmeldung: Supabase-Auth-E-Mail-Vorlagen (Deutsch), Redirect-URLs; **SMS-Bestätigung** (Telefon) und Turnstile fehlen.
 3. E-Mail-Benachrichtigung bei neuen Nachrichten (Edge Function) – bisher nur Posteingang im Konto.
 4. Auto-Ablauf nach 90 Tagen (`pg_cron`: `published` → `expired`, 30 Tage später löschen), Verlängerungsmail.

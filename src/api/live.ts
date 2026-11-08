@@ -163,8 +163,12 @@ export function createLiveApi(url: string, anonKey: string): Api {
       return data!.status as ListingStatus
     },
     async deleteListing(id) {
+      // Die Foto-Zeilen verschwinden per Cascade, die Dateien im Speicher nicht – Pfade vorher merken.
+      const { data: fotos } = await sb.from('listing_photos').select('storage_path').eq('listing_id', id)
       const { error } = await sb.from('listings').delete().eq('id', id)
       fail(error)
+      const pfade = (fotos ?? []).map((p: Row) => p.storage_path as string).filter(Boolean)
+      if (pfade.length) await sb.storage.from(BUCKET).remove(pfade)
     },
 
     async revealContact(id): Promise<ContactInfo> {
