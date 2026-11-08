@@ -1,6 +1,6 @@
 # FreiHaus
 
-Kostenloses Immobilienportal „von privat“ (Verkauf, ohne Makler, ohne Provision). Neuntes Projekt.
+Kostenloses Immobilienportal „von privat“ (Kauf und Miete, ohne Makler, ohne Provision). Neuntes Projekt.
 **Deutsch ist die Quellsprache** (Code-Kommentare, Texte, Commits). Konzept und Rechtslage stehen in
 `../Immobilienportal-Konzept.md` – **dort zuerst nachlesen**, bevor Funktionen ergänzt werden.
 
@@ -11,9 +11,9 @@ Kostenloses Immobilienportal „von privat“ (Verkauf, ohne Makler, ohne Provis
 - **Demo live:** https://rianvegeta1991.github.io/freihaus/ (GitHub Pages, Workflow `.github/workflows/pages.yml`, Unterpfad
   `/freihaus/` über `VITE_BASE`; `noindex`). Repo `rianvegeta1991/freihaus` ist **öffentlich** (Pages geht im Free-Tarif nur so) –
   deshalb nie Schlüssel oder echte Personendaten einchecken. Tiefe Links liefert `404.html` (Status 404, App läuft trotzdem; für SEO ungeeignet).
-- **Supabase-Projekt `fzhaozatyraflbwdspgd` (Frankfurt) läuft**, Migrationen 0001–0003 sind eingespielt, `kontakt.freihaus@proton.me` ist `admin`.
+- **Supabase-Projekt `fzhaozatyraflbwdspgd` (Frankfurt) läuft**, Migrationen 0001–0003 sind eingespielt, **0004 (Miete) noch NICHT** – bis dahin schlägt die Suche im Live-Modus fehl (Spalte `offer` fehlt), `kontakt.freihaus@proton.me` ist `admin`.
   Lokal per `.env.local` (git-ignoriert) angebunden; die **GitHub-Pages-Demo bleibt im Demo-Modus**, bis URL/Key als Actions-Secrets eingetragen sind.
-  **Keine eigene Domain.** Der eingebaute Supabase-Mailversand erlaubt nur wenige Anmelde-Mails pro Stunde („email rate limit exceeded") –
+  **Gewählte Domain: `freihaus-immoportal.de`** (laut DNS-Prüfung am 8.11.2026 wahrscheinlich frei, noch nicht gekauft). Der eingebaute Supabase-Mailversand erlaubt nur wenige Anmelde-Mails pro Stunde („email rate limit exceeded") –
   vor dem Start eigenen SMTP-Dienst anbinden und die Auth-Mails eindeutschen.
 - **Live-Test gegen echtes Backend (8.11.2026, in Chrome per Erweiterung):** Konto speichern, Inserat anlegen (6 Schritte, 3 Fotos → Speicher
   `<uid>/<inserat>/<id>.webp`, öffentlich lesbar), Moderation freigeben, Suche, Hausnummer nicht öffentlich (`listing_private` für Anon gesperrt, 42501),
@@ -62,7 +62,7 @@ Neue Seiten müssen die Überschriftenfolge einhalten (`listingCard(l, 2)` direk
 - Vanilla TypeScript + Vite, kein Framework. `src/dom.ts` (`h()`) setzt Inhalte nur über `textContent` –
   **nie Nutzereingaben per `innerHTML` einfügen** (nur feste SVG-Symbole über `svg()`).
 - `src/api/` – ein `Api`-Interface (`types.ts`), zwei Umsetzungen: `demo.ts`, `live.ts`. Seiten kennen nur das Interface.
-- `src/pages/` – Start, Suche, Inserat, Verkaufen-Assistent (6 Schritte), Konto, Moderation, Info/Rechtliches.
+- `src/pages/` – Start, Suche (Reiter Kaufen/Mieten), Inserat, Inserieren-Assistent (6 Schritte, Route `/verkaufen`), Konto, Moderation, Info/Rechtliches.
 - `src/validation.ts` spiegelt die Datenbank-Prüfungen (Pflichtfelder, Energieausweis), damit Fehler vor dem Absenden verständlich sind.
 - Schriften (Inter, Fraunces) liegen über `@fontsource` im Build – **keine Google-Fonts-Einbindung** (DSGVO).
 
@@ -85,5 +85,19 @@ Neue Seiten müssen die Überschriftenfolge einhalten (`listingCard(l, 2)` direk
 5. Karte (OpenStreetMap/MapLibre), Suchaufträge, Briefcode „Adresse bestätigt“.
 6. SEO: Die Seite ist eine reine Client-App. Für Regionalseiten/Ratgeber braucht es Vorab-Rendern (Prerender) und `sitemap.xml`.
 7. Energieausweis-Pflichtfelder gegen den **aktuellen** Gesetzestext prüfen (GEG vs. Gebäudemodernisierungsgesetz, Endenergie vs. Primärenergie).
-8. Hosting: Cloudflare Pages (`public/_redirects` liegt bereit); Domain steht aus (freihaus.de ist vergeben).
+8. Hosting: Cloudflare Pages (`public/_redirects` liegt bereit); Domain `freihaus-immoportal.de` kaufen, dann DNS, Absender `anmeldung@freihaus-immoportal.de` und Redirect-URLs einrichten.
 9. Bildkomprimierung (`src/image.ts`) und Foto-Upload sind nur im Demo-Modus im Browser getestet, **nicht** gegen echten Speicher.
+
+## Miete (seit 8.11.2026)
+
+Ein Inserat hat `offer` = `kauf` oder `miete` (Migration `0004_miete.sql`, Typ `OfferKind`). Bei Miete ist `price_eur` die **Nettokaltmiete pro Monat**.
+Mietfelder: `service_costs_eur` (Nebenkosten), `deposit_eur` (Kaution, höchstens 3 × Kaltmiete, § 551 BGB), `available_from`, `furnished`.
+Regeln in der Datenbank: Miete nur für Haus/Wohnung (kein Grundstück), Mietpreis 50–100.000 €, Kaufpreis wie bisher 1.000 €–100 Mio. €,
+Mietfelder bei Kauf verboten. Energieausweis-Pflichtangaben gelten **auch bei Miete**. Status `sold` heißt bei Miete „Vermietet“ (`statusLabel`).
+Oberfläche: Reiter „Kaufen | Mieten“ auf `/suche` (`?angebot=miete`), Auswahl in der Startseiten-Suche, „Verkaufen/Vermieten“ im ersten Schritt
+des Assistenten, Mietkasten auf der Inserat-Seite (Gesamtmiete = Kalt + Nebenkosten), Mieter-Sicherheitstipps.
+Wortwahl: FreiHaus **inseriert, es vermittelt nicht** (§ 34c GewO / Wohnungsvermittlungsgesetz) – „vermitteln“ nicht in Texte schreiben.
+Für Mietinserate gilt zusätzlich das AGG (keine diskriminierenden Ausschlüsse; steht in Nutzungsbedingungen und Moderationsregeln).
+**Vor dem Livegang anwaltlich klären:** Mietpreisbremse-/Auskunftspflichten des Vermieters (§§ 556d ff. BGB), Zweckentfremdung/Ferienwohnung,
+ob Hausverwaltungen wirklich ausgeschlossen bleiben sollen, und die Formulierungen zur Untervermietung.
+**Nicht gebaut:** WG-Zimmer/Zwischenmiete, befristete Mietverträge als eigene Angabe, Haustier-/Raucher-Felder, Mieter-Suchaufträge.

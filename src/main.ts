@@ -32,7 +32,8 @@ function drawHeader(): void {
       h('a', { class: 'logo', href: '/', 'aria-label': 'FreiHaus – zur Startseite' }, svg(LOGO), h('span', { class: 'logo-t' }, 'Frei', h('span', null, 'Haus'))),
       h('nav', { class: 'nav', 'aria-label': 'Hauptmenü' },
         h('a', { href: '/suche' }, 'Kaufen'),
-        h('a', { href: '/verkaufen' }, 'Verkaufen'),
+        h('a', { href: '/suche?angebot=miete' }, 'Mieten'),
+        h('a', { href: '/verkaufen' }, 'Inserieren'),
         h('a', { href: '/sicherheit' }, 'Sicherheit'),
         u?.isAdmin ? h('a', { href: '/admin' }, 'Moderation') : null,
         u ? h('a', { class: 'nav-user', href: '/konto' }, 'Mein Konto') : h('a', { class: 'btn btn-secondary nav-login', href: '/anmelden' }, 'Anmelden'))))

@@ -8,6 +8,8 @@ const MIGRATION = readFileSync(new URL('../supabase/migrations/0001_schema.sql',
 
 const CONTACT = readFileSync(new URL('../supabase/migrations/0003_contact.sql', import.meta.url), 'utf8')
 
+const MIETE = readFileSync(new URL('../supabase/migrations/0004_miete.sql', import.meta.url), 'utf8')
+
 const BOOT = `
   create role anon nologin; create role authenticated nologin; create role service_role nologin;
   create schema auth;
@@ -69,6 +71,7 @@ beforeEach(async () => {
   await db.exec(BOOT)
   await db.exec(MIGRATION)
   await db.exec(CONTACT)
+  await db.exec(MIETE)
   await db.exec(`insert into auth.users (id, email) values ('${U1}', 'a@x.de'), ('${U2}', 'b@x.de'), ('${ADM}', 'm@x.de')`)
   await db.exec(`update profiles set role = 'admin' where id = '${ADM}'`)
 })
@@ -382,5 +385,55 @@ describe('Merkliste', () => {
     expect(await fehler(() => db.query(`insert into saved_listings (user_id, listing_id) values ($1, $2)`, [U1, id]))).toMatch(/row-level security/)
     await as(U1)
     expect((await db.query(`select 1 from saved_listings`)).rows).toHaveLength(0)
+  })
+})
+
+describe('Mietinserate', () => {
+  const MIET = `insert into listings (owner_id, type, offer, title, description, postal_code, city, price_eur, service_costs_eur, deposit_eur,
+    available_from, furnished, living_area_m2, year_built, energy_state, energy_kind, energy_value, energy_carrier, energy_class)
+    values ($1, $2, $3, 'Helle 3-Zimmer-Wohnung in Connewitz', '${'Schöne Wohnung. '.repeat(5)}', '04277', 'Leipzig', $4, $5, $6,
+    '2026-12-01', true, 84, 1905, 'vorhanden', 'verbrauch', 98, 'Fernwärme', 'C') returning id`
+  const miete = (preis: number, nk: number | null, kaution: number | null, typ = 'wohnung', angebot = 'miete') =>
+    db.query(MIET, [U1, typ, angebot, preis, nk, kaution])
+
+  it('nimmt ein gültiges Mietinserat an', async () => {
+    await root()
+    const r = await miete(850, 180, 2550)
+    expect(r.rows).toHaveLength(1)
+  })
+  it('bestehende Kaufinserate bekommen Angebotsart „kauf“ und leere Mietfelder', async () => {
+    const id = await neuesInserat(U1)
+    const r = await db.query<{ offer: string; deposit_eur: number | null; furnished: boolean }>(`select offer, deposit_eur, furnished from listings where id = $1`, [id])
+    expect(r.rows[0]).toEqual({ offer: 'kauf', deposit_eur: null, furnished: false })
+  })
+  it('lässt Mieten nur zwischen 50 und 100.000 € im Monat zu', async () => {
+    await root()
+    expect(await fehler(() => miete(40, null, null))).toMatch(/listing_preis/)
+    expect(await fehler(() => miete(100001, null, null))).toMatch(/listing_preis/)
+  })
+  it('lässt Kaufpreise unter 1.000 € weiterhin nicht zu', async () => {
+    await root()
+    expect(await fehler(() => miete(500, null, null, 'haus', 'kauf'))).toMatch(/listing_preis|listing_kauf_ohne_mietfelder/)
+  })
+  it('begrenzt die Kaution auf drei Nettokaltmieten', async () => {
+    await root()
+    expect(await fehler(() => miete(850, 180, 2551))).toMatch(/listing_miete/)
+    expect((await miete(850, 180, 2550)).rows).toHaveLength(1)
+  })
+  it('vermietet keine Grundstücke', async () => {
+    await root()
+    expect(await fehler(() => miete(850, null, null, 'grundstueck'))).toMatch(/listing_miete/)
+  })
+  it('Kaufinserate dürfen keine Mietfelder tragen', async () => {
+    await root()
+    expect(await fehler(() => miete(349000, 180, null, 'haus', 'kauf'))).toMatch(/listing_kauf_ohne_mietfelder/)
+  })
+  it('auch Mietinserate brauchen Wohnfläche und Energieausweis, sobald sie mehr als Entwurf sind', async () => {
+    await root()
+    const r = await db.query<{ id: string }>(MIET, [U1, 'wohnung', 'miete', 850, null, null])
+    const id = r.rows[0].id
+    for (let i = 0; i < 3; i++) await db.query(`insert into listing_photos (listing_id, storage_path, position) values ($1, $2, $3)`, [id, `${U1}/${id}-${i}.webp`, i])
+    await db.query(`update listings set energy_state = null where id = $1`, [id])
+    expect(await fehler(() => db.query(`update listings set status = 'pending' where id = $1`, [id]))).toMatch(/listing_pflichtangaben/)
   })
 })

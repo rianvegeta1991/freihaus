@@ -1,6 +1,6 @@
 import { h } from './dom'
-import { fmtEur, fmtNum, fmtPerM2, STATUS_LABEL, TYPE_LABEL } from './format'
-import type { Listing, ListingStatus, User } from './types'
+import { fmtNum, fmtPerM2, fmtPrice, statusLabel, TYPE_LABEL } from './format'
+import type { Listing, ListingStatus, OfferKind, User } from './types'
 
 /** Aktueller Nutzer – wird von main.ts gesetzt und bei Anmeldung/Abmeldung aktualisiert. */
 export const session: { user: User | null } = { user: null }
@@ -40,8 +40,8 @@ export function field(label: string, control: HTMLElement, opts: { error?: strin
     opts.error ? h('p', { class: 'err', id: `${id}-err`, role: 'alert' }, h('span', { 'aria-hidden': 'true' }, '⚠ '), opts.error) : null)
 }
 
-export function statusChip(s: ListingStatus): HTMLElement {
-  const l = STATUS_LABEL[s]
+export function statusChip(s: ListingStatus, offer: OfferKind = 'kauf'): HTMLElement {
+  const l = statusLabel(s, offer)
   return h('span', { class: `chip chip-${s}`, title: l.hint }, h('span', { 'aria-hidden': 'true' }, l.icon), ' ', l.text)
 }
 
@@ -53,7 +53,7 @@ export function badges(l: Listing): HTMLElement {
 }
 
 export function facts(l: Listing): string[] {
-  const out: string[] = [TYPE_LABEL[l.type]]
+  const out: string[] = [l.offer === 'miete' ? `${TYPE_LABEL[l.type]} zur Miete` : TYPE_LABEL[l.type]]
   if (l.rooms) out.push(`${fmtNum(l.rooms)} Zi.`)
   if (l.livingAreaM2) out.push(`${fmtNum(l.livingAreaM2)} m²`)
   if (l.plotAreaM2) out.push(l.type === 'grundstueck' ? `${fmtNum(l.plotAreaM2)} m²` : `${fmtNum(l.plotAreaM2)} m² Grundstück`)
@@ -69,7 +69,7 @@ export function listingCard(l: Listing, level: 2 | 3 = 3): HTMLElement {
       p ? h('img', { src: p.url, alt: p.alt ?? `Foto von ${l.title}`, loading: 'lazy', width: 400, height: 250 }) : h('div', { class: 'noimg' }, 'Kein Foto'),
       h('span', { class: 'badge badge-main card-badge' }, 'Von privat')),
     h('div', { class: 'card-body' },
-      h('div', { class: 'card-price' }, fmtEur(l.priceEur), l.livingAreaM2 ? h('span', { class: 'per' }, ` · ${fmtPerM2(l.priceEur, l.livingAreaM2)}`) : null),
+      h('div', { class: 'card-price' }, fmtPrice(l), l.livingAreaM2 ? h('span', { class: 'per' }, ` · ${fmtPerM2(l.priceEur, l.livingAreaM2, l.offer)}`) : null),
       h(`h${level}`, { class: 'card-title' }, l.title),
       h('p', { class: 'card-facts' }, facts(l).join(' · ')),
       h('p', { class: 'card-loc' }, `${l.postalCode} ${l.city}${l.district ? `-${l.district}` : ''}`,

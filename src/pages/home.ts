@@ -4,12 +4,15 @@ import { navigate, type Route } from '../router'
 import { listingCard, setTitle } from '../ui'
 
 export async function renderHome(_r: Route): Promise<HTMLElement> {
-  setTitle('', 'FreiHaus: Häuser und Wohnungen direkt vom Eigentümer kaufen und verkaufen. Kostenlos, ohne Provision, nur von privat.')
+  setTitle('', 'FreiHaus: Häuser und Wohnungen direkt vom Eigentümer kaufen, mieten, verkaufen und vermieten. Kostenlos, ohne Provision, nur von privat.')
   const [latest, stats] = await Promise.all([api.search({ sort: 'neu' }), api.stats()])
 
   const q = h('input', { type: 'search', name: 'q', placeholder: 'Ort oder Postleitzahl', 'aria-label': 'Ort oder Postleitzahl', autocomplete: 'off', enterkeyhint: 'search' })
-  const form = h('form', { class: 'hero-search', role: 'search', onSubmit: (e: Event) => { e.preventDefault(); navigate(`/suche?q=${encodeURIComponent(q.value.trim())}`) } },
-    q, h('button', { class: 'btn btn-primary', type: 'submit' }, 'Suchen'))
+  const offer = h('select', { name: 'angebot', 'aria-label': 'Kaufen oder mieten' }, h('option', { value: 'kauf' }, 'Kaufen'), h('option', { value: 'miete' }, 'Mieten')) as HTMLSelectElement
+  const form = h('form', { class: 'hero-search', role: 'search', onSubmit: (e: Event) => {
+    e.preventDefault()
+    navigate(`/suche?${offer.value === 'miete' ? 'angebot=miete&' : ''}q=${encodeURIComponent(q.value.trim())}`)
+  } }, offer, q, h('button', { class: 'btn btn-primary', type: 'submit' }, 'Suchen'))
 
   return h('div', null,
     h('section', { class: 'hero' },
@@ -17,7 +20,7 @@ export async function renderHome(_r: Route): Promise<HTMLElement> {
         h('h1', null, 'Häuser und Wohnungen direkt vom Eigentümer'),
         h('p', { class: 'lead' }, 'Kostenlos inserieren, kostenlos suchen. Kein Makler, keine Provision, keine versteckten Gebühren.'),
         form,
-        h('p', { class: 'hero-sell' }, 'Sie möchten verkaufen? ', h('a', { href: '/verkaufen' }, 'Jetzt kostenlos inserieren →')))),
+        h('p', { class: 'hero-sell' }, 'Sie möchten verkaufen oder vermieten? ', h('a', { href: '/verkaufen' }, 'Jetzt kostenlos inserieren →')))),
 
     h('section', { class: 'wrap section' },
       h('div', { class: 'section-head' }, h('h2', null, 'Neu inseriert'), h('a', { href: '/suche' }, 'Alle ansehen →')),
@@ -31,7 +34,7 @@ export async function renderHome(_r: Route): Promise<HTMLElement> {
         h('ol', { class: 'steps' },
           h('li', null, h('strong', null, 'Inserat anlegen'), h('span', null, 'In etwa 10 Minuten: Angaben, Energieausweis, mindestens 3 Fotos. Wir führen Sie Schritt für Schritt.')),
           h('li', null, h('strong', null, 'Kurze Prüfung'), h('span', null, 'Neue Inserate schauen wir uns von Hand an, damit Betrüger draußen bleiben.')),
-          h('li', null, h('strong', null, 'Direkt in Kontakt'), h('span', null, 'Interessenten schreiben Ihnen. Besichtigung, Preis und Vertrag klären Sie selbst – den Kaufvertrag beurkundet der Notar.'))))),
+          h('li', null, h('strong', null, 'Direkt in Kontakt'), h('span', null, 'Interessenten schreiben Ihnen. Besichtigung, Preis und Vertrag klären Sie selbst – einen Kaufvertrag beurkundet der Notar, einen Mietvertrag schließen Sie mit dem Vermieter.'))))),
 
     h('section', { class: 'wrap section' },
       h('h2', null, 'Warum FreiHaus?'),
@@ -44,8 +47,9 @@ export async function renderHome(_r: Route): Promise<HTMLElement> {
 
     h('section', { class: 'band band-warn' },
       h('div', { class: 'wrap' },
-        h('h2', null, 'Wichtig beim Immobilienkauf'),
+        h('h2', null, 'Wichtig bei Kauf und Miete'),
         h('p', null, 'Ein Kaufvertrag über eine Immobilie muss immer notariell beurkundet werden. ', h('strong', null, 'Überweisen Sie niemals Geld an Privatpersonen, bevor der Notartermin stattgefunden hat'), ' – auch nicht als „Reservierung“ oder „Kaution“. '),
+        h('p', null, h('strong', null, 'Bei einer Mietwohnung gilt dasselbe:'), ' Keine Miete, Kaution oder „Reservierung“ vor der Besichtigung und dem unterschriebenen Mietvertrag, und Schlüssel gibt es nur persönlich vor Ort.'),
         h('p', null, h('a', { href: '/sicherheit' }, 'Betrug erkennen: unsere Sicherheitstipps →')))))
 }
 

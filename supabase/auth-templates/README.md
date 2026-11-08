@@ -17,5 +17,5 @@ Die Platzhalter `{{ .ConfirmationURL }}` nicht ändern. Die Vorlagen enthalten k
   Adresse der Live-Seite (inkl. `/konto`) sowie `http://localhost:8802/**` eintragen.
 - **Authentication → SMTP Settings:** eigenen Versanddienst eintragen. Der eingebaute Versand erlaubt nur wenige Mails
   pro Stunde und sendet von einer Supabase-Adresse. Realistisch braucht das eine **eigene Domain** (Absender
-  `anmeldung@<domain>` mit SPF/DKIM/DMARC); mit einer `@proton.me`-Adresse als Absender würden die Mails über fremde Server vermutlich als Spam aussortiert.
+  `anmeldung@freihaus-immoportal.de` mit SPF/DKIM/DMARC); mit einer `@proton.me`-Adresse als Absender würden die Mails über fremde Server vermutlich als Spam aussortiert.
 - **Authentication → Rate Limits:** Nach dem Wechsel auf eigenen Versand das Mail-Limit anheben (das niedrige Standardlimit gilt für den eingebauten Versand).

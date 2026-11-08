@@ -8,8 +8,8 @@ import { errMsg, field, session, setTitle, spinner, toast } from '../ui'
 
 const STEPS = ['Objekt', 'Lage & Daten', 'Energieausweis', 'Fotos', 'Kontakt', 'Prüfen']
 const STEP_KEYS: (keyof Errors)[][] = [
-  ['type', 'title', 'description'],
-  ['postalCode', 'city', 'priceEur', 'livingAreaM2', 'rooms'],
+  ['offer', 'type', 'title', 'description'],
+  ['postalCode', 'city', 'priceEur', 'serviceCostsEur', 'depositEur', 'availableFrom', 'livingAreaM2', 'rooms'],
   ['energyState', 'energyKind', 'energyValue', 'energyCarrier', 'energyClass', 'yearBuilt'],
   ['photos'],
   ['contactMode', 'contactEmail', 'contactPhone'],
@@ -69,11 +69,34 @@ export async function renderSell(r: Route): Promise<HTMLElement> {
 
   // ---------- Schritte
   function stepObject(): HTMLElement[] {
+    const miete = input.offer === 'miete'
+    const types: [string, string][] = [['haus', 'Haus'], ['wohnung', 'Wohnung']]
+    if (!miete) types.push(['grundstueck', 'Grundstück'])
     return [
       h('p', { class: 'step-intro' }, 'Beschreiben Sie Ihr Objekt so, wie Sie es einem Bekannten beschreiben würden – ehrlich und konkret.'),
-      sel('type', 'Art der Immobilie', [['haus', 'Haus'], ['wohnung', 'Wohnung'], ['grundstueck', 'Grundstück']], { required: true }),
-      txt('title', 'Überschrift', { required: true, max: 100, ph: 'z. B. Reihenhaus mit Südgarten in Gohlis', hint: '10 bis 100 Zeichen. Ohne Telefonnummern und ohne Großbuchstaben-Schreierei.' }),
-      txt('description', 'Beschreibung', { required: true, rows: 9, max: 5000, hint: 'Mindestens 50 Zeichen: Zustand, Ausstattung, Lage, Besonderheiten, Gründe für den Verkauf. Bitte keine Kontaktdaten in den Text schreiben – dafür gibt es später ein eigenes Feld.' }),
+      sel('offer', 'Was möchten Sie tun?', [['kauf', 'Verkaufen'], ['miete', 'Vermieten']], {
+        required: true,
+        onChange: () => { if (input.offer === 'miete' && input.type === 'grundstueck') input.type = 'wohnung'; errs = {}; draw() },
+      }),
+      sel('type', 'Art der Immobilie', types, { required: true }),
+      txt('title', 'Überschrift', { required: true, max: 100, ph: miete ? 'z. B. Helle 2-Zimmer-Wohnung mit Balkon in Plagwitz' : 'z. B. Reihenhaus mit Südgarten in Gohlis', hint: '10 bis 100 Zeichen. Ohne Telefonnummern und ohne Großbuchstaben-Schreierei.' }),
+      txt('description', 'Beschreibung', { required: true, rows: 9, max: 5000, hint: miete
+        ? 'Mindestens 50 Zeichen: Zustand, Ausstattung, Lage, Hausregeln, Haustiere. Bitte keine Kontaktdaten in den Text schreiben – dafür gibt es später ein eigenes Feld.'
+        : 'Mindestens 50 Zeichen: Zustand, Ausstattung, Lage, Besonderheiten, Gründe für den Verkauf. Bitte keine Kontaktdaten in den Text schreiben – dafür gibt es später ein eigenes Feld.' }),
+      miete ? h('div', { class: 'notice' }, h('strong', null, 'Faire Vermietung: '), 'Bitte schreiben Sie keine Ausschlüsse nach Herkunft, Religion, Geschlecht, Alter, Behinderung oder Familienstand in das Inserat. Solche Inserate sperren wir (Allgemeines Gleichbehandlungsgesetz).') : null,
+    ].filter(Boolean) as HTMLElement[]
+  }
+  /** Felder, die nur bei Mietinseraten gebraucht werden. */
+  function mietFelder(): HTMLElement[] {
+    const furn = h('input', { type: 'checkbox', checked: input.furnished }) as HTMLInputElement
+    furn.addEventListener('change', () => { input.furnished = furn.checked })
+    return [
+      h('div', { class: 'two' },
+        numF('serviceCostsEur', 'Nebenkosten pro Monat', { unit: '€', step: 10, hint: 'Vorauszahlung inkl. Heizung, soweit enthalten.' }),
+        numF('depositEur', 'Kaution', { unit: '€', step: 50, hint: 'Höchstens drei Monatskaltmieten (§ 551 BGB).' })),
+      h('div', { class: 'two' },
+        txt('availableFrom', 'Frei ab', { type: 'date', hint: 'Leer lassen für „nach Absprache“.' }),
+        h('div', { class: 'field' }, h('label', { class: 'check' }, furn, h('span', null, 'Möbliert')))),
     ]
   }
   function stepData(): HTMLElement[] {
@@ -81,7 +104,10 @@ export async function renderSell(r: Route): Promise<HTMLElement> {
       h('div', { class: 'two' }, txt('postalCode', 'Postleitzahl', { required: true, max: 5, auto: 'postal-code' }), txt('city', 'Ort', { required: true, max: 80 })),
       h('div', { class: 'two' }, txt('district', 'Ortsteil (optional)', { max: 80 }), txt('street', 'Straße (optional)', { max: 100, hint: 'Wird im Inserat angezeigt – ohne Hausnummer.' })),
       txt('houseNo', 'Hausnummer (nur für Sie)', { max: 10, hint: 'Wird NICHT öffentlich angezeigt. So schützen wir Ihr Zuhause vor ungebetenen Besuchern.' }),
-      numF('priceEur', 'Kaufpreis', { required: true, unit: '€', step: 1000 }),
+      input.offer === 'miete'
+        ? numF('priceEur', 'Kaltmiete pro Monat', { required: true, unit: '€', step: 10, hint: 'Nettokaltmiete ohne Nebenkosten, in ganzen Euro.' })
+        : numF('priceEur', 'Kaufpreis', { required: true, unit: '€', step: 1000 }),
+      ...(input.offer === 'miete' ? mietFelder() : []),
       input.type !== 'grundstueck' ? h('div', { class: 'two' }, numF('livingAreaM2', 'Wohnfläche', { required: true, unit: 'm²', step: 0.5 }), numF('rooms', 'Zimmer', { step: 0.5 })) : null,
       h('div', { class: 'two' }, numF('plotAreaM2', 'Grundstücksfläche', { unit: 'm²', step: 1 }), input.type !== 'grundstueck' ? numF('yearBuilt', 'Baujahr', { hint: 'Bei vorhandenem Energieausweis Pflicht.' }) : null),
     ].filter(Boolean) as HTMLElement[]
@@ -89,7 +115,7 @@ export async function renderSell(r: Route): Promise<HTMLElement> {
   function stepEnergy(): HTMLElement[] {
     if (input.type === 'grundstueck') return [h('p', null, 'Für Grundstücke ist kein Energieausweis nötig. Weiter geht es mit den Fotos.')]
     const out: HTMLElement[] = [
-      h('div', { class: 'notice' }, h('strong', null, 'Pflichtangaben: '), 'Wenn ein Energieausweis vorliegt, müssen bestimmte Werte in der Anzeige stehen. Wir fragen sie deshalb einzeln ab. Sie finden sie auf Seite 1 bis 2 des Energieausweises.'),
+      h('div', { class: 'notice' }, h('strong', null, 'Pflichtangaben: '), 'Wenn ein Energieausweis vorliegt, müssen bestimmte Werte in der Anzeige stehen – beim Verkauf und bei der Vermietung. Wir fragen sie deshalb einzeln ab. Sie finden sie auf Seite 1 bis 2 des Energieausweises.'),
       sel('energyState', 'Liegt ein Energieausweis vor?', [['', '– bitte wählen –'], ['vorhanden', 'Ja, er liegt vor'], ['folgt', 'Noch nicht – ich lege ihn spätestens zur Besichtigung vor'], ['nicht_erforderlich', 'Nicht erforderlich (z. B. Denkmal, besondere Ausnahme)']], { required: true, onChange: () => { errs = {}; draw() } }),
     ]
     if (input.energyState === 'vorhanden') {
@@ -162,10 +188,12 @@ export async function renderSell(r: Route): Promise<HTMLElement> {
       h('p', { class: 'step-intro' }, 'Fast geschafft. Bitte prüfen Sie Ihre Angaben noch einmal.'),
       hasErrors(e) ? h('div', { class: 'notice notice-warn', role: 'alert' }, h('strong', null, 'Noch nicht vollständig: '), h('ul', null, Object.values(e).map((m) => h('li', null, m)))) : h('div', { class: 'notice notice-ok' }, h('span', { 'aria-hidden': 'true' }, '✔ '), 'Alle Pflichtangaben sind vollständig.'),
       h('dl', { class: 'facts review' },
-        rv('Überschrift', input.title), rv('Ort', `${input.postalCode} ${input.city}`), rv('Preis', input.priceEur ? `${input.priceEur.toLocaleString('de-DE')} €` : '–'),
+        rv('Überschrift', input.title), rv('Ort', `${input.postalCode} ${input.city}`), rv(input.offer === 'miete' ? 'Kaltmiete' : 'Preis', input.priceEur ? `${input.priceEur.toLocaleString('de-DE')} €${input.offer === 'miete' ? ' pro Monat' : ''}` : '–'),
         rv('Fotos', String(photos.length)), rv('Kontakt', input.contactMode === 'nachricht' ? 'Nachrichtenformular' : input.contactMode === 'login_email' ? 'Formular + E-Mail' : 'Formular + E-Mail + Telefon')),
       h('div', { class: 'checks' },
-        cb('privat', 'Ich biete diese Immobilie als Privatperson an und bin kein Makler. Ich bin Eigentümer oder zum Verkauf berechtigt.'),
+        cb('privat', input.offer === 'miete'
+          ? 'Ich biete diese Immobilie als Privatperson an und bin kein Makler und keine Hausverwaltung. Ich bin Eigentümer oder zur Vermietung berechtigt (z. B. mit Erlaubnis des Vermieters zur Untervermietung).'
+          : 'Ich biete diese Immobilie als Privatperson an und bin kein Makler. Ich bin Eigentümer oder zum Verkauf berechtigt.'),
         cb('fotos', 'Ich besitze alle Rechte an den hochgeladenen Fotos und Texten und erlaube FreiHaus, sie im Inserat anzuzeigen.'),
         cb('regeln', h('span', null, 'Ich habe die ', h('a', { href: '/nutzungsbedingungen', target: '_blank' }, 'Nutzungsbedingungen'), ' und die ', h('a', { href: '/datenschutz', target: '_blank' }, 'Datenschutzerklärung'), ' gelesen. Ich weiß: Wer Geld im Voraus verlangt, wird gesperrt.'))),
       h('p', { class: 'hint' }, 'Beim ersten Inserat prüfen wir von Hand, bevor es online geht. Das dauert in der Regel höchstens ein bis zwei Werktage.'),

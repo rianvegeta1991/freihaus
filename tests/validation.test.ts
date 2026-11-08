@@ -50,6 +50,37 @@ describe('validateListing', () => {
   })
 })
 
+describe('Mietinserate', () => {
+  const miete = (): ListingInput => ({ ...gut(), offer: 'miete', type: 'wohnung', priceEur: 850, serviceCostsEur: 180, depositEur: 2550, availableFrom: '2026-12-01' })
+
+  it('akzeptiert ein vollständiges Mietinserat', () => {
+    expect(hasErrors(validateListing(miete(), 3))).toBe(false)
+  })
+  it('prüft die Kaltmiete gegen den Mietrahmen statt gegen den Kaufpreisrahmen', () => {
+    expect(validateListing({ ...miete(), priceEur: 40 }, 3).priceEur).toMatch(/Kaltmiete/)
+    expect(validateListing({ ...miete(), priceEur: 100_001 }, 3).priceEur).toBeTruthy()
+    // 850 € wären als Kaufpreis zu niedrig – als Miete sind sie in Ordnung
+    expect(validateListing({ ...gut(), priceEur: 850 }, 3).priceEur).toMatch(/Kaufpreis/)
+  })
+  it('begrenzt die Kaution auf drei Monatskaltmieten', () => {
+    expect(validateListing({ ...miete(), depositEur: 2551 }, 3).depositEur).toMatch(/drei Monatskaltmieten/)
+    expect(validateListing({ ...miete(), depositEur: 2550 }, 3).depositEur).toBeUndefined()
+    expect(validateListing({ ...miete(), depositEur: null }, 3).depositEur).toBeUndefined()
+  })
+  it('lehnt Grundstücke zur Miete ab', () => {
+    expect(validateListing({ ...miete(), type: 'grundstueck' }, 3).type).toBeTruthy()
+  })
+  it('prüft Nebenkosten und Datum nur bei Miete', () => {
+    expect(validateListing({ ...miete(), serviceCostsEur: -1 }, 3).serviceCostsEur).toBeTruthy()
+    expect(validateListing({ ...miete(), availableFrom: '1.12.2026' }, 3).availableFrom).toBeTruthy()
+    // Beim Kauf werden Mietfelder ignoriert (der Server speichert sie nicht)
+    expect(hasErrors(validateListing({ ...gut(), serviceCostsEur: -1, depositEur: 99999999, availableFrom: 'x' }, 3))).toBe(false)
+  })
+  it('verlangt auch bei Miete den Energieausweis', () => {
+    expect(validateListing({ ...miete(), energyState: '' }, 3).energyState).toBeTruthy()
+  })
+})
+
 describe('Energieeffizienzklasse', () => {
   it('ordnet Kennwerte der Skala zu', () => {
     expect(energyClassFor(20)).toBe('A+')

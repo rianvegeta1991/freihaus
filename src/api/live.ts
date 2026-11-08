@@ -1,6 +1,5 @@
-// Echte Anbindung an Supabase. ACHTUNG: Diese Datei ist gegen KEIN echtes Supabase-Projekt getestet
-// (es gab beim Schreiben noch keines). Die Datenbankregeln selbst sind in tests/db.test.ts geprüft;
-// ob die Aufrufe hier sie korrekt ansprechen, zeigt erst der erste Lauf gegen ein Projekt.
+// Echte Anbindung an Supabase. Gegen das echte Projekt getestet (8.11.2026): Konto, Inserat, Fotos, Moderation, Melden.
+// Die Datenbankregeln selbst sind in tests/db.test.ts geprüft.
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { withBase } from '../router'
 import type {
@@ -24,9 +23,10 @@ export function createLiveApi(url: string, anonKey: string): Api {
   const toPhoto = (p: Row): Photo => ({ id: p.id, path: p.storage_path, url: photoUrl(p.storage_path), position: p.position, alt: p.alt ?? undefined })
 
   const toListing = (r: Row): Listing => ({
-    id: r.id, ownerId: r.owner_id, status: r.status, type: r.type, title: r.title, description: r.description,
+    id: r.id, ownerId: r.owner_id, status: r.status, type: r.type, offer: r.offer ?? 'kauf', title: r.title, description: r.description,
     postalCode: r.postal_code, city: r.city, district: r.district ?? undefined, street: r.street ?? undefined,
-    priceEur: r.price_eur, livingAreaM2: r.living_area_m2 != null ? Number(r.living_area_m2) : undefined,
+    priceEur: r.price_eur, serviceCostsEur: r.service_costs_eur ?? undefined, depositEur: r.deposit_eur ?? undefined,
+    availableFrom: r.available_from ?? undefined, furnished: !!r.furnished, livingAreaM2: r.living_area_m2 != null ? Number(r.living_area_m2) : undefined,
     plotAreaM2: r.plot_area_m2 != null ? Number(r.plot_area_m2) : undefined, rooms: r.rooms != null ? Number(r.rooms) : undefined,
     yearBuilt: r.year_built ?? undefined, energyState: r.energy_state ?? undefined, energyKind: r.energy_kind ?? undefined,
     energyValue: r.energy_value != null ? Number(r.energy_value) : undefined, energyCarrier: r.energy_carrier ?? undefined,
@@ -54,7 +54,11 @@ export function createLiveApi(url: string, anonKey: string): Api {
   }
 
   const dbFields = (i: ListingInput) => ({
-    type: i.type, title: i.title.trim(), description: i.description.trim(), postal_code: i.postalCode.trim(), city: i.city.trim(),
+    type: i.type, offer: i.offer,
+    // Mietfelder gehören nur zu Mietinseraten (die Datenbank verlangt das).
+    service_costs_eur: i.offer === 'miete' ? i.serviceCostsEur : null, deposit_eur: i.offer === 'miete' ? i.depositEur : null,
+    available_from: i.offer === 'miete' && i.availableFrom ? i.availableFrom : null, furnished: i.offer === 'miete' && i.furnished,
+    title: i.title.trim(), description: i.description.trim(), postal_code: i.postalCode.trim(), city: i.city.trim(),
     district: i.district.trim() || null, street: i.street.trim() || null, price_eur: i.priceEur, living_area_m2: i.livingAreaM2,
     plot_area_m2: i.plotAreaM2, rooms: i.rooms, year_built: i.yearBuilt, energy_state: i.energyState || null,
     energy_kind: i.energyKind || null, energy_value: i.energyValue, energy_carrier: i.energyCarrier.trim() || null,
@@ -81,6 +85,7 @@ export function createLiveApi(url: string, anonKey: string): Api {
       let q = sb.from('listings').select(SELECT).eq('status', 'published')
       const term = (f.q ?? '').trim().replace(/[,()%*\\]/g, ' ')
       if (term) q = /^\d{1,5}$/.test(term) ? q.like('postal_code', `${term}%`) : q.or(`city.ilike.%${term}%,district.ilike.%${term}%`)
+      if (f.offer) q = q.eq('offer', f.offer)
       if (f.type) q = q.eq('type', f.type)
       if (f.priceMax) q = q.lte('price_eur', f.priceMax)
       if (f.areaMin) q = q.gte('living_area_m2', f.areaMin)
@@ -112,8 +117,9 @@ export function createLiveApi(url: string, anonKey: string): Api {
       if (!data) return null
       const p = (Array.isArray(data.listing_private) ? data.listing_private[0] : data.listing_private) ?? {}
       return {
-        type: data.type, title: data.title, description: data.description, postalCode: data.postal_code, city: data.city,
+        type: data.type, offer: data.offer ?? 'kauf', title: data.title, description: data.description, postalCode: data.postal_code, city: data.city,
         district: data.district ?? '', street: data.street ?? '', houseNo: p.house_no ?? '', priceEur: data.price_eur,
+        serviceCostsEur: data.service_costs_eur ?? null, depositEur: data.deposit_eur ?? null, availableFrom: data.available_from ?? '', furnished: !!data.furnished,
         livingAreaM2: data.living_area_m2 != null ? Number(data.living_area_m2) : null, plotAreaM2: data.plot_area_m2 != null ? Number(data.plot_area_m2) : null,
         rooms: data.rooms != null ? Number(data.rooms) : null, yearBuilt: data.year_built, energyState: data.energy_state ?? '', energyKind: data.energy_kind ?? '',
         energyValue: data.energy_value != null ? Number(data.energy_value) : null, energyCarrier: data.energy_carrier ?? '', energyClass: data.energy_class ?? '',

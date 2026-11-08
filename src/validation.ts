@@ -8,8 +8,8 @@ export type Errors = Partial<Record<keyof ListingInput | 'photos', string>>
 
 export function emptyInput(): ListingInput {
   return {
-    type: 'haus', title: '', description: '', postalCode: '', city: '', district: '', street: '', houseNo: '',
-    priceEur: null, livingAreaM2: null, plotAreaM2: null, rooms: null, yearBuilt: null,
+    type: 'haus', offer: 'kauf', title: '', description: '', postalCode: '', city: '', district: '', street: '', houseNo: '',
+    priceEur: null, serviceCostsEur: null, depositEur: null, availableFrom: '', furnished: false, livingAreaM2: null, plotAreaM2: null, rooms: null, yearBuilt: null,
     energyState: '', energyKind: '', energyValue: null, energyCarrier: '', energyClass: '',
     contactMode: 'nachricht', contactEmail: '', contactPhone: '',
   }
@@ -24,8 +24,20 @@ export function validateListing(i: ListingInput, photoCount: number): Errors {
   if (!len(i.description, 50, 5000)) e.description = 'Die Beschreibung braucht mindestens 50 Zeichen (höchstens 5000).'
   if (!/^[0-9]{5}$/.test(i.postalCode.trim())) e.postalCode = 'Bitte eine fünfstellige Postleitzahl eingeben.'
   if (!len(i.city, 2, 80)) e.city = 'Bitte den Ort angeben.'
-  if (i.priceEur == null || !Number.isInteger(i.priceEur) || i.priceEur < 1000 || i.priceEur > 100_000_000)
+  if (i.offer === 'miete') {
+    if (i.priceEur == null || !Number.isInteger(i.priceEur) || i.priceEur < 50 || i.priceEur > 100_000)
+      e.priceEur = 'Bitte die Kaltmiete pro Monat zwischen 50 € und 100.000 € angeben (ganze Euro).'
+    if (i.type === 'grundstueck') e.type = 'Grundstücke können nur zum Kauf angeboten werden.'
+    if (i.serviceCostsEur != null && (!Number.isInteger(i.serviceCostsEur) || i.serviceCostsEur < 0 || i.serviceCostsEur > 10_000))
+      e.serviceCostsEur = 'Bitte die Nebenkosten pro Monat zwischen 0 € und 10.000 € angeben (ganze Euro).'
+    if (i.depositEur != null) {
+      if (!Number.isInteger(i.depositEur) || i.depositEur < 0) e.depositEur = 'Bitte die Kaution in ganzen Euro angeben.'
+      else if (i.priceEur != null && i.depositEur > 3 * i.priceEur) e.depositEur = 'Die Kaution darf höchstens drei Monatskaltmieten betragen (§ 551 BGB).'
+    }
+    if (i.availableFrom && !/^\d{4}-\d{2}-\d{2}$/.test(i.availableFrom)) e.availableFrom = 'Bitte ein gültiges Datum wählen.'
+  } else if (i.priceEur == null || !Number.isInteger(i.priceEur) || i.priceEur < 1000 || i.priceEur > 100_000_000) {
     e.priceEur = 'Bitte einen Kaufpreis zwischen 1.000 € und 100 Mio. € angeben.'
+  }
 
   if (i.type !== 'grundstueck') {
     if (i.livingAreaM2 == null || i.livingAreaM2 <= 0) e.livingAreaM2 = 'Bitte die Wohnfläche angeben.'

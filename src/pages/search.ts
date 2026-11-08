@@ -2,14 +2,16 @@ import { api } from '../api'
 import { h, clear } from '../dom'
 import { fmtNum } from '../format'
 import { navigate, type Route } from '../router'
-import type { PropertyType, SearchFilter } from '../types'
+import type { OfferKind, PropertyType, SearchFilter } from '../types'
 import { errMsg, listingCard, setTitle, spinner } from '../ui'
 
 function readFilter(q: URLSearchParams): SearchFilter {
   const num = (k: string) => { const v = Number(q.get(k)); return Number.isFinite(v) && v > 0 ? v : undefined }
   const sort = q.get('sort')
+  const offer: OfferKind = q.get('angebot') === 'miete' ? 'miete' : 'kauf'
+  const types = offer === 'miete' ? ['haus', 'wohnung'] : ['haus', 'wohnung', 'grundstueck']
   return {
-    q: q.get('q') ?? '', type: (['haus', 'wohnung', 'grundstueck'].includes(q.get('type') ?? '') ? q.get('type') : '') as PropertyType | '',
+    q: q.get('q') ?? '', offer, type: (types.includes(q.get('type') ?? '') ? q.get('type') : '') as PropertyType | '',
     priceMax: num('preis'), areaMin: num('flaeche'), roomsMin: num('zimmer'),
     sort: sort === 'preis_auf' || sort === 'preis_ab' ? sort : 'neu',
   }
@@ -17,7 +19,10 @@ function readFilter(q: URLSearchParams): SearchFilter {
 
 export async function renderSearch(r: Route): Promise<HTMLElement> {
   const f = readFilter(r.query)
-  setTitle(f.q ? `Immobilien in ${f.q}` : 'Immobilien kaufen', 'Häuser, Wohnungen und Grundstücke direkt vom Eigentümer – ohne Provision.')
+  const miete = f.offer === 'miete'
+  const heading = miete ? 'Immobilien mieten' : 'Immobilien kaufen'
+  setTitle(f.q ? `${miete ? 'Mietangebote' : 'Immobilien'} in ${f.q}` : heading,
+    miete ? 'Wohnungen und Häuser zur Miete direkt vom Eigentümer – ohne Provision.' : 'Häuser, Wohnungen und Grundstücke direkt vom Eigentümer – ohne Provision.')
 
   const input = (name: string, label: string, type: string, value: string, extra: Record<string, unknown> = {}) =>
     h('label', { class: 'f' }, h('span', null, label), h('input', { name, type, value, ...extra }))
@@ -25,10 +30,17 @@ export async function renderSearch(r: Route): Promise<HTMLElement> {
     h('label', { class: 'f' }, h('span', null, label),
       h('select', { name }, opts.map(([v, t]) => h('option', { value: v, selected: v === value }, t))))
 
+  const typeOpts: [string, string][] = [['', 'Alle'], ['haus', 'Haus'], ['wohnung', 'Wohnung']]
+  if (!miete) typeOpts.push(['grundstueck', 'Grundstück'])
+
+  const tabs = h('nav', { class: 'offer-tabs', 'aria-label': 'Angebotsart' },
+    h('a', { href: '/suche', 'aria-current': miete ? null : 'page' }, 'Kaufen'),
+    h('a', { href: '/suche?angebot=miete', 'aria-current': miete ? 'page' : null }, 'Mieten'))
+
   const form = h('form', { class: 'filters', role: 'search', 'aria-label': 'Suche eingrenzen', onSubmit: (e: Event) => { e.preventDefault(); apply() } },
     input('q', 'Ort oder PLZ', 'search', f.q ?? '', { placeholder: 'z. B. Leipzig oder 04155', autocomplete: 'off' }),
-    select('type', 'Art', [['', 'Alle'], ['haus', 'Haus'], ['wohnung', 'Wohnung'], ['grundstueck', 'Grundstück']], f.type ?? ''),
-    input('preis', 'Preis bis (€)', 'number', f.priceMax ? String(f.priceMax) : '', { min: 0, step: 10000, inputmode: 'numeric' }),
+    select('type', 'Art', typeOpts, f.type ?? ''),
+    input('preis', miete ? 'Kaltmiete bis (€)' : 'Preis bis (€)', 'number', f.priceMax ? String(f.priceMax) : '', { min: 0, step: miete ? 50 : 10000, inputmode: 'numeric' }),
     input('flaeche', 'Fläche ab (m²)', 'number', f.areaMin ? String(f.areaMin) : '', { min: 0, inputmode: 'numeric' }),
     input('zimmer', 'Zimmer ab', 'number', f.roomsMin ? String(f.roomsMin) : '', { min: 0, step: 0.5, inputmode: 'decimal' }),
     select('sort', 'Sortierung', [['neu', 'Neueste zuerst'], ['preis_auf', 'Preis aufsteigend'], ['preis_ab', 'Preis absteigend']], f.sort ?? 'neu'),
@@ -37,6 +49,7 @@ export async function renderSearch(r: Route): Promise<HTMLElement> {
   function apply(): void {
     const d = new FormData(form)
     const p = new URLSearchParams()
+    if (miete) p.set('angebot', 'miete')
     for (const k of ['q', 'type', 'preis', 'flaeche', 'zimmer', 'sort']) { const v = String(d.get(k) ?? '').trim(); if (v && !(k === 'sort' && v === 'neu')) p.set(k, v) }
     navigate(`/suche${p.toString() ? `?${p}` : ''}`)
   }
@@ -56,5 +69,5 @@ export async function renderSearch(r: Route): Promise<HTMLElement> {
     } catch (e) { clear(results); results.append(h('p', { class: 'err' }, errMsg(e))) }
   })()
 
-  return h('div', { class: 'wrap section' }, h('h1', null, 'Immobilien kaufen'), form, results)
+  return h('div', { class: 'wrap section' }, h('h1', null, heading), tabs, form, results)
 }

@@ -1,6 +1,6 @@
 import { api } from '../api'
 import { h, clear } from '../dom'
-import { fmtDate, fmtEur, TYPE_LABEL } from '../format'
+import { fmtDate, fmtPrice, TYPE_LABEL } from '../format'
 import { navigate, type Route } from '../router'
 import type { ContactMessage, Listing, ModerationAction, Report } from '../types'
 import { TOPICS } from './kontakt'
@@ -55,7 +55,7 @@ export async function renderAdmin(r: Route): Promise<HTMLElement> {
       h('div', { class: 'my-img' }, l.photos[0] ? h('img', { src: l.photos[0].url, alt: '', width: 120, height: 80 }) : null),
       h('div', { class: 'my-main' },
         h('h3', null, h('a', { href: `/inserat/${l.id}`, target: '_blank' }, l.title)),
-        h('p', { class: 'meta' }, `${TYPE_LABEL[l.type]} · ${fmtEur(l.priceEur)} · ${l.postalCode} ${l.city} · ${l.photos.length} Fotos · eingereicht ${fmtDate(l.createdAt)}`),
+        h('p', { class: 'meta' }, `${TYPE_LABEL[l.type]}${l.offer === 'miete' ? ' (Miete)' : ''} · ${fmtPrice(l)} · ${l.postalCode} ${l.city} · ${l.photos.length} Fotos · eingereicht ${fmtDate(l.createdAt)}`),
         h('p', null, l.description.slice(0, 220) + (l.description.length > 220 ? ' …' : ''))),
       h('div', { class: 'my-actions' },
         h('button', { class: 'btn btn-primary', type: 'button', onClick: () => decide(l, 'freigeben') }, 'Freigeben'),

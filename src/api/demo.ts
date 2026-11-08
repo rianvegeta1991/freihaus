@@ -32,7 +32,7 @@ function seed(): Row[] {
     const id = `demo-${i}`
     const photos: Photo[] = [0, 1, 2].map((p) => ({ id: `${id}-p${p}`, path: `${id}/${p}`, url: houseSvg(30 + i * 37 + p * 8, i + p), position: p, alt: 'Platzhalter-Abbildung' }))
     return {
-      id, ownerId: 'demo-owner', status: 'published', type: 'haus', title: '', description: '', postalCode: '04155', city: 'Leipzig',
+      id, ownerId: 'demo-owner', status: 'published', type: 'haus', offer: 'kauf', furnished: false, title: '', description: '', postalCode: '04155', city: 'Leipzig',
       priceEur: 300000, contactMode: 'nachricht', addressVerified: false, createdAt: new Date(now - i * 3 * DAY).toISOString(),
       publishedAt: new Date(now - i * 3 * DAY).toISOString(), expiresAt: new Date(now + (90 - i * 3) * DAY).toISOString(),
       photos, houseNo: '12', contactEmail: 'beispiel@freihaus.test', contactPhone: '0341 1234567',
@@ -46,6 +46,9 @@ function seed(): Row[] {
     base(4, { type: 'grundstueck', title: 'Baugrundstück in ruhiger Lage in Taucha', description: 'Voll erschlossenes Baugrundstück, 640 m², Südausrichtung, Bebauungsplan liegt vor. Direktverkauf durch die Eigentümerin, ohne Makler und ohne Provision.', city: 'Taucha', postalCode: '04425', street: 'Am Anger', priceEur: 158000, plotAreaM2: 640 }),
     base(5, { type: 'wohnung', title: '2-Zimmer-Wohnung als Kapitalanlage in Lindenau', description: 'Vermietete 2-Zimmer-Wohnung, Mieter seit 2019 zuverlässig, Balkon, Aufzug im Haus. Unterlagen (Teilungserklärung, Wirtschaftsplan) liegen vor.', postalCode: '04177', district: 'Lindenau', street: 'Georg-Schwarz-Straße', priceEur: 129000, livingAreaM2: 52, rooms: 2, yearBuilt: 1928, energyState: 'vorhanden', energyKind: 'bedarf', energyValue: 134, energyCarrier: 'Gas', energyClass: 'E' }),
     base(6, { title: 'Doppelhaushälfte in Engelsdorf mit Werkstatt', description: 'Doppelhaushälfte mit Werkstatt im Nebengebäude, Solaranlage, Wärmepumpe seit 2021. Gepflegter Zustand, bezugsfrei nach Vereinbarung. Verkauf direkt vom Eigentümer.', city: 'Leipzig', postalCode: '04319', district: 'Engelsdorf', street: 'Hauptstraße', priceEur: 398000, livingAreaM2: 124, plotAreaM2: 410, rooms: 4.5, yearBuilt: 2004, energyState: 'vorhanden', energyKind: 'bedarf', energyValue: 38, energyCarrier: 'Strom (Wärmepumpe)', energyClass: 'A' }),
+    base(7, { type: 'wohnung', offer: 'miete', title: 'Helle 2-Zimmer-Wohnung mit Balkon in Plagwitz', description: 'Ruhige Altbauwohnung im dritten Obergeschoss, Dielenboden, Einbauküche kann übernommen werden. Straßenbahn und Weiße Elster in wenigen Minuten. Vermietung direkt vom Eigentümer, keine Provision. Haustiere nach Absprache.', postalCode: '04229', district: 'Plagwitz', street: 'Karl-Heine-Straße', priceEur: 720, serviceCostsEur: 160, depositEur: 2160, availableFrom: new Date(now + 30 * DAY).toISOString().slice(0, 10), livingAreaM2: 56, rooms: 2, yearBuilt: 1912, energyState: 'vorhanden', energyKind: 'verbrauch', energyValue: 104, energyCarrier: 'Fernwärme', energyClass: 'C' }),
+    base(8, { type: 'wohnung', offer: 'miete', title: 'Möbliertes Apartment nahe Hauptbahnhof, ab sofort', description: 'Vollständig möbliertes Apartment mit Schlafsofa, Küchenzeile und eigenem Bad. Geeignet für Berufspendler oder Studierende. Internet ist vorhanden, Waschmaschine im Haus. Vermietung privat, ohne Makler.', postalCode: '04109', district: 'Zentrum', street: 'Rudolphstraße', priceEur: 690, serviceCostsEur: 120, depositEur: 1380, availableFrom: new Date(now).toISOString().slice(0, 10), furnished: true, livingAreaM2: 32, rooms: 1, yearBuilt: 1998, energyState: 'vorhanden', energyKind: 'bedarf', energyValue: 82, energyCarrier: 'Fernwärme', energyClass: 'C' }),
+    base(9, { offer: 'miete', title: 'Reihenhaus mit Garten für Familien in Holzhausen', description: 'Gepflegtes Reihenhaus mit kleinem Garten, Keller, zwei Stellplätzen vor dem Haus. Kindergarten und Grundschule zu Fuß erreichbar. Der Einzug ist nach Absprache möglich; ich freue mich auf ein persönliches Kennenlernen.', city: 'Leipzig', postalCode: '04288', district: 'Holzhausen', street: 'Hauptstraße', priceEur: 1280, serviceCostsEur: 250, depositEur: 3840, livingAreaM2: 118, rooms: 4, yearBuilt: 2001, energyState: 'folgt', contactMode: 'login_email' }),
   ]
 }
 
@@ -67,8 +70,9 @@ export function createDemoApi(): Api {
   const mineOf = (id: string) => rows.find((r) => r.id === id && r.ownerId === user?.id)
   const need = (): User => { if (!user) throw new Error('login_required: Bitte melden Sie sich an.'); return user }
   const toInput = (r: Row): ListingInput => ({
-    type: r.type, title: r.title, description: r.description, postalCode: r.postalCode, city: r.city, district: r.district ?? '',
-    street: r.street ?? '', houseNo: r.houseNo, priceEur: r.priceEur, livingAreaM2: r.livingAreaM2 ?? null, plotAreaM2: r.plotAreaM2 ?? null,
+    type: r.type, offer: r.offer, title: r.title, description: r.description, postalCode: r.postalCode, city: r.city, district: r.district ?? '',
+    street: r.street ?? '', houseNo: r.houseNo, priceEur: r.priceEur, serviceCostsEur: r.serviceCostsEur ?? null, depositEur: r.depositEur ?? null,
+    availableFrom: r.availableFrom ?? '', furnished: r.furnished, livingAreaM2: r.livingAreaM2 ?? null, plotAreaM2: r.plotAreaM2 ?? null,
     rooms: r.rooms ?? null, yearBuilt: r.yearBuilt ?? null, energyState: r.energyState ?? '', energyKind: r.energyKind ?? '',
     energyValue: r.energyValue ?? null, energyCarrier: r.energyCarrier ?? '', energyClass: r.energyClass ?? '',
     contactMode: r.contactMode, contactEmail: r.contactEmail, contactPhone: r.contactPhone,
@@ -97,6 +101,7 @@ export function createDemoApi(): Api {
       const q = (f.q ?? '').trim().toLowerCase()
       let out = rows.filter(visible)
       if (q) out = out.filter((r) => /^\d{1,5}$/.test(q) ? r.postalCode.startsWith(q) : `${r.city} ${r.district ?? ''}`.toLowerCase().includes(q))
+      if (f.offer) out = out.filter((r) => r.offer === f.offer)
       if (f.type) out = out.filter((r) => r.type === f.type)
       if (f.priceMax) out = out.filter((r) => r.priceEur <= f.priceMax!)
       if (f.areaMin) out = out.filter((r) => (r.livingAreaM2 ?? 0) >= f.areaMin!)
@@ -116,7 +121,12 @@ export function createDemoApi(): Api {
     async saveDraft(input, id) {
       const u = need()
       const fields = {
-        type: input.type, title: input.title.trim(), description: input.description.trim(), postalCode: input.postalCode.trim(), city: input.city.trim(),
+        type: input.type, offer: input.offer,
+        serviceCostsEur: input.offer === 'miete' ? input.serviceCostsEur ?? undefined : undefined,
+        depositEur: input.offer === 'miete' ? input.depositEur ?? undefined : undefined,
+        availableFrom: input.offer === 'miete' && input.availableFrom ? input.availableFrom : undefined,
+        furnished: input.offer === 'miete' && input.furnished,
+        title: input.title.trim(), description: input.description.trim(), postalCode: input.postalCode.trim(), city: input.city.trim(),
         district: input.district.trim() || undefined, street: input.street.trim() || undefined, priceEur: input.priceEur ?? 0,
         livingAreaM2: input.livingAreaM2 ?? undefined, plotAreaM2: input.plotAreaM2 ?? undefined, rooms: input.rooms ?? undefined,
         yearBuilt: input.yearBuilt ?? undefined, energyState: input.energyState || undefined, energyKind: input.energyKind || undefined,

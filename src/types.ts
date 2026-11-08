@@ -1,4 +1,5 @@
 export type PropertyType = 'haus' | 'wohnung' | 'grundstueck'
+export type OfferKind = 'kauf' | 'miete'
 export type ListingStatus = 'draft' | 'pending' | 'published' | 'paused' | 'sold' | 'expired' | 'blocked'
 export type EnergyState = 'vorhanden' | 'folgt' | 'nicht_erforderlich'
 export type EnergyKind = 'bedarf' | 'verbrauch'
@@ -19,6 +20,8 @@ export interface Listing {
   ownerId: string
   status: ListingStatus
   type: PropertyType
+  /** Kauf oder Miete. Bei Miete ist `priceEur` die monatliche Nettokaltmiete. */
+  offer: OfferKind
   title: string
   description: string
   postalCode: string
@@ -26,6 +29,13 @@ export interface Listing {
   district?: string
   street?: string
   priceEur: number
+  /** Nur Miete: Nebenkosten-Vorauszahlung pro Monat. */
+  serviceCostsEur?: number
+  /** Nur Miete: Kaution (höchstens drei Nettokaltmieten). */
+  depositEur?: number
+  /** Nur Miete: frühester Einzug, ISO-Datum (JJJJ-MM-TT). */
+  availableFrom?: string
+  furnished: boolean
   livingAreaM2?: number
   plotAreaM2?: number
   rooms?: number
@@ -47,6 +57,7 @@ export interface Listing {
 /** Alles, was der Inserent im Formular eingibt (inkl. nicht öffentlicher Felder). */
 export interface ListingInput {
   type: PropertyType
+  offer: OfferKind
   title: string
   description: string
   postalCode: string
@@ -55,6 +66,10 @@ export interface ListingInput {
   street: string
   houseNo: string
   priceEur: number | null
+  serviceCostsEur: number | null
+  depositEur: number | null
+  availableFrom: string
+  furnished: boolean
   livingAreaM2: number | null
   plotAreaM2: number | null
   rooms: number | null
@@ -71,6 +86,7 @@ export interface ListingInput {
 
 export interface SearchFilter {
   q?: string
+  offer?: OfferKind
   type?: PropertyType | ''
   priceMax?: number
   areaMin?: number

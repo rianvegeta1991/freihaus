@@ -1,6 +1,6 @@
 import { api } from '../api'
 import { h, clear } from '../dom'
-import { daysLeft, fmtDate, fmtEur, STATUS_LABEL } from '../format'
+import { daysLeft, fmtDate, fmtPrice, statusLabel } from '../format'
 import { navigate, type Route } from '../router'
 import type { Listing, ListingStatus } from '../types'
 import { errMsg, field, listingCard, session, setTitle, spinner, statusChip, toast } from '../ui'
@@ -48,16 +48,17 @@ export async function renderAccount(r: Route): Promise<HTMLElement> {
         if (confirmText && !window.confirm(confirmText)) return
         try {
           const s = await api.setStatus(l.id, status)
-          toast(s === 'pending' ? 'Eingereicht. Wir prüfen es.' : `Status: ${STATUS_LABEL[s].text}`)
+          toast(s === 'pending' ? 'Eingereicht. Wir prüfen es.' : `Status: ${statusLabel(s, l.offer).text}`)
           await loadListings()
         } catch (e) { toast(errMsg(e), 'fehler') }
       } }, label)
     const actions: HTMLElement[] = []
     if (l.status === 'draft') actions.push(h('a', { class: 'btn btn-primary', href: `/verkaufen/${l.id}` }, 'Weiter bearbeiten'))
     if (['paused', 'expired'].includes(l.status)) actions.push(act(l.status === 'expired' ? 'Erneut einreichen' : 'Wieder einreichen', 'pending', undefined, 'btn btn-primary'), h('a', { class: 'btn btn-secondary', href: `/verkaufen/${l.id}` }, 'Bearbeiten'))
-    if (l.status === 'published') actions.push(act('Pausieren', 'paused'), act('Als verkauft melden', 'sold', 'Wirklich als verkauft melden? Das Inserat wird dann beendet und lässt sich nicht wieder aktivieren.'))
+    const fertig = l.offer === 'miete' ? 'vermietet' : 'verkauft'
+    if (l.status === 'published') actions.push(act('Pausieren', 'paused'), act(`Als ${fertig} melden`, 'sold', `Wirklich als ${fertig} melden? Das Inserat wird dann beendet und lässt sich nicht wieder aktivieren.`))
     if (l.status === 'pending') actions.push(act('Zurückziehen', 'draft'))
-    if (l.status === 'paused') actions.push(act('Als verkauft melden', 'sold', 'Wirklich als verkauft melden?'))
+    if (l.status === 'paused') actions.push(act(`Als ${fertig} melden`, 'sold', `Wirklich als ${fertig} melden?`))
     if (['draft', 'pending'].includes(l.status)) actions.push(h('button', { class: 'btn btn-ghost', type: 'button', onClick: async () => {
       if (!window.confirm('Dieses Inserat endgültig löschen?')) return
       try { await api.deleteListing(l.id); await loadListings() } catch (e) { toast(errMsg(e), 'fehler') }
@@ -67,8 +68,8 @@ export async function renderAccount(r: Route): Promise<HTMLElement> {
       h('div', { class: 'my-img' }, l.photos[0] ? h('img', { src: l.photos[0].url, alt: '', width: 120, height: 80, loading: 'lazy' }) : h('div', { class: 'noimg' }, '–')),
       h('div', { class: 'my-main' },
         h('h3', null, l.status === 'published' || l.status === 'pending' || l.status === 'paused' ? h('a', { href: `/inserat/${l.id}` }, l.title || '(ohne Titel)') : (l.title || '(ohne Titel)')),
-        h('p', { class: 'meta' }, statusChip(l.status), ` ${fmtEur(l.priceEur)} · ${l.city}`, l.status === 'published' && left != null ? ` · noch ${left} Tage online` : ''),
-        h('p', { class: 'hint' }, STATUS_LABEL[l.status].hint)),
+        h('p', { class: 'meta' }, statusChip(l.status, l.offer), ` ${fmtPrice(l)} · ${l.city}`, l.status === 'published' && left != null ? ` · noch ${left} Tage online` : ''),
+        h('p', { class: 'hint' }, statusLabel(l.status, l.offer).hint)),
       h('div', { class: 'my-actions' }, actions))
   }
 
