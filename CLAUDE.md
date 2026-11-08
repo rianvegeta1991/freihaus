@@ -78,7 +78,8 @@ Neue Seiten müssen die Überschriftenfolge einhalten (`listingCard(l, 2)` direk
 ## Offene Punkte (Reihenfolge ungefähr nach Wichtigkeit)
 
 1. ~~Supabase-Projekt einrichten, Migrationen einspielen, `live.ts` testen~~ – erledigt (siehe „Stand"); offen: Test mit zweitem Konto, Anmelde-Wiederholung.
-2. Anmeldung: Supabase-Auth-E-Mail-Vorlagen (Deutsch), Redirect-URLs; **SMS-Bestätigung** (Telefon) und Turnstile fehlen.
+2. Anmeldung: Deutsche Mail-Vorlagen liegen fertig in `supabase/auth-templates/` (noch **nicht** im Dashboard eingefügt, dort auch
+   Checkliste für Redirect-URLs und eigenen SMTP – braucht eine eigene Domain); **SMS-Bestätigung** (Telefon) und Turnstile fehlen.
 3. E-Mail-Benachrichtigung bei neuen Nachrichten (Edge Function) – bisher nur Posteingang im Konto.
 4. Auto-Ablauf nach 90 Tagen (`pg_cron`: `published` → `expired`, 30 Tage später löschen), Verlängerungsmail.
 5. Karte (OpenStreetMap/MapLibre), Suchaufträge, Briefcode „Adresse bestätigt“.

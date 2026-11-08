@@ -99,7 +99,7 @@ export async function renderPrivacy(_r: Route): Promise<HTMLElement> {
     h('h2', null, 'Welche Daten wir verarbeiten und warum'),
     h('ul', null,
       h('li', null, h('strong', null, 'Konto: '), 'E-Mail-Adresse, optional Name und Telefonnummer – zur Anmeldung und Nutzung (Vertragserfüllung, Art. 6 Abs. 1 lit. b DSGVO).'),
-      h('li', null, h('strong', null, 'Inserate: '), 'Angaben zum Objekt, Fotos (ohne Standortdaten), Hausnummer nur für den Inserenten, Kontaktdaten nur nach Auswahl und nur für angemeldete Nutzer.'),
+      h('li', null, h('strong', null, 'Inserate: '), 'Angaben zum Objekt, Fotos (ohne Standortdaten), Hausnummer nur für den Inserenten, Kontaktdaten nur nach Auswahl und nur für angemeldete Nutzer. Die Fotos liegen im Bildspeicher und sind unter ihrer Bild-Adresse für jeden abrufbar, der diese Adresse kennt – auch vor der Freigabe eines Inserats und nach einer Sperre. Löschen Sie ein Inserat, löschen wir auch seine Fotos.'),
       h('li', null, h('strong', null, 'Nachrichten: '), 'Inhalt und Zeitpunkt, zur Weiterleitung an den Inserenten.'),
       h('li', null, h('strong', null, 'Meldungen: '), 'Inhalt, ggf. Name und E-Mail des Meldenden (rechtliche Verpflichtung nach dem Digital Services Act).'),
       h('li', null, h('strong', null, 'Sicherheit: '), 'Zugriffsprotokolle, Zähler für Kontaktaufrufe und Nachrichten (berechtigtes Interesse, Betrugs- und Spam-Abwehr).'),
