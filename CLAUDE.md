@@ -21,7 +21,8 @@ Kostenloses Immobilienportal „von privat“ (Verkauf, ohne Makler, ohne Provis
   alle sensiblen Tabellen für Anon gesperrt – **alles bestanden**. **Nicht getestet:** erneutes Anmelden (Mail-Limit), Nachricht an Inserenten,
   `reveal_contact`, Merkliste, Zugriff eines zweiten, nicht-admin Kontos, Löschen mit Speicher-Aufräumen (neu, siehe unten).
   Fund: `deleteListing` ließ die Fotodateien im Speicher liegen (nur die Zeilen gingen per Cascade) – seit 8.11. räumt `live.ts` sie mit ab.
-  Ein gesperrtes Test-Inserat („Testhaus mit Garten in Leipzig-Gohlis") liegt noch in der Datenbank samt 3 Fotos; Entwürfe sind Foto-URL-seitig öffentlich lesbar (Bucket ist public).
+  Test-Inserat und Test-Kontaktnachricht sind wieder gelöscht (Datenbank und Speicher geprüft, 8.11.2026). Der Foto-Bucket ist public:
+  wer die URL kennt, sieht ein Foto auch bei Entwürfen und gesperrten Inseraten – in der Datenschutzerklärung erwähnen.
 - Rechtstexte (`src/pages/info.ts`) sind **Entwürfe mit Platzhaltern in [eckigen Klammern]** – nicht live schalten,
   bevor ein Anwalt sie geprüft hat und die echten Angaben drinstehen.
 
