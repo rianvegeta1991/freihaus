@@ -87,7 +87,7 @@ Neue Seiten müssen die Überschriftenfolge einhalten (`listingCard(l, 2)` direk
 5. Karte (OpenStreetMap/MapLibre), Suchaufträge, Briefcode „Adresse bestätigt“.
 6. SEO: Die Seite ist eine reine Client-App. Für Regionalseiten/Ratgeber braucht es Vorab-Rendern (Prerender) und `sitemap.xml`.
 7. Energieausweis-Pflichtfelder gegen den **aktuellen** Gesetzestext prüfen (GEG vs. Gebäudemodernisierungsgesetz, Endenergie vs. Primärenergie).
-8. Hosting: Cloudflare Pages (`public/_redirects` liegt bereit); Domain `freihaus-immoportal.de` kaufen, dann DNS, Absender `anmeldung@freihaus-immoportal.de` und Redirect-URLs einrichten.
+8. Hosting: Cloudflare Workers (statische Assets, `wrangler.jsonc`, SPA-Fallback statt `_redirects`; GitHub-Anbindung „Workers Builds“: Build `npm run build`, Deploy `npx wrangler deploy`). Domain `freihaus-immoportal.de` gehört Bastian (Hetzner, 9.11.2026), DNS-Zone in der Hetzner Console; für Cloudflare müssen die Nameserver auf Cloudflare umgestellt werden. Danach Absender `anmeldung@freihaus-immoportal.de` und Redirect-URLs einrichten.
 9. Bildkomprimierung (`src/image.ts`) und Foto-Upload sind nur im Demo-Modus im Browser getestet, **nicht** gegen echten Speicher.
 
 ## Miete (seit 8.11.2026)

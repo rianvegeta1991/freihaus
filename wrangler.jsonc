@@ -1,0 +1,10 @@
+{
+  // Cloudflare: statische Seite aus dem Vite-Build. Der Name muss dem Projektnamen im Cloudflare-Dashboard entsprechen.
+  "name": "freihaus",
+  "compatibility_date": "2026-11-09",
+  "assets": {
+    "directory": "./dist",
+    // Direkte Aufrufe wie /suche oder /inserat/123 liefern die App (statt 404); sie kümmert sich selbst um die Route.
+    "not_found_handling": "single-page-application"
+  }
+}
