@@ -13,8 +13,17 @@ Kostenloses Immobilienportal „von privat“ (Kauf und Miete, ohne Makler, ohne
   deshalb nie Schlüssel oder echte Personendaten einchecken. Tiefe Links liefert `404.html` (Status 404, App läuft trotzdem; für SEO ungeeignet).
 - **Supabase-Projekt `fzhaozatyraflbwdspgd` (Frankfurt) läuft**, Migrationen 0001–0005 sind eingespielt (0004 Miete und 0005 Speicher-SELECT-Regel am 8.11.2026, beide live getestet), `kontakt.freihaus@proton.me` ist `admin`.
   Lokal per `.env.local` (git-ignoriert) angebunden; die **GitHub-Pages-Demo bleibt im Demo-Modus**, bis URL/Key als Actions-Secrets eingetragen sind.
-  **Gewählte Domain: `freihaus-immoportal.de`** (laut DNS-Prüfung am 8.11.2026 wahrscheinlich frei, noch nicht gekauft). Der eingebaute Supabase-Mailversand erlaubt nur wenige Anmelde-Mails pro Stunde („email rate limit exceeded") –
-  vor dem Start eigenen SMTP-Dienst anbinden und die Auth-Mails eindeutschen.
+  Der eingebaute Supabase-Mailversand erlaubt nur wenige Anmelde-Mails pro Stunde („email rate limit exceeded") –
+  vor dem Start eigenen SMTP-Dienst anbinden und die Auth-Mails eindeutschen (Plan: Brevo, 300 Mails/Tag gratis, EU-Firma; noch nicht eingerichtet).
+- **Domain `freihaus-immoportal.de` (seit 9.–22.11.2026 live):** Registrar **Hetzner** (Domain Robot, 3,90 €/Jahr + 2 € Einrichtung, Guthaben vorab
+  aufgeladen; Holder-Handle als natürliche Person, ohne Firmenname). **Nameserver stehen bei Cloudflare** (`benedict.ns.cloudflare.com`, `sneh.ns.cloudflare.com`);
+  DNS-Einträge also im Cloudflare-Dashboard pflegen, die Zone in der Hetzner Console ist nur noch ein Überbleibsel. Die falsch geschriebene Domain
+  `reihaus-immoportal.de` wurde fälschlich registriert und gelöscht (Löschfrist läuft; prüfen, ob noch ein Eintrag im Robot steht).
+  Hetzner verlangt Verifizierung der Handles (roter Hinweis im Robot) – Stand nicht geprüft.
+- **Hosting: Cloudflare Workers (Static Assets)**, Projekt `freihaus` (Konto `kontakt-freihaus`), GitHub-Anbindung „Workers Builds" (Build `npm run build`,
+  Deploy `npx wrangler deploy`, `wrangler.jsonc`, `.node-version` 22). Jeder Push nach `main` baut neu. Erreichbar unter https://freihaus-immoportal.de,
+  https://www.freihaus-immoportal.de und https://freihaus.kontakt-freihaus.workers.dev – **im Demo-Modus** (keine Supabase-Variablen im Build, `noindex`).
+  Supabase-Werte würden als **Build**-Variablen eingetragen (Settings → Builds), nicht als Laufzeit-Variablen. Cloudflare-KI-Bot-Einstellungen: Training blockieren (Bastians Wahl offen).
 - **Live-Test gegen echtes Backend (8.11.2026, in Chrome per Erweiterung):** Konto speichern, Inserat anlegen (6 Schritte, 3 Fotos → Speicher
   `<uid>/<inserat>/<id>.webp`, öffentlich lesbar), Moderation freigeben, Suche, Hausnummer nicht öffentlich (`listing_private` für Anon gesperrt, 42501),
   Melden → Moderation, Sperren ohne Begründung abgelehnt / mit Begründung im Konto sichtbar, Kontaktnachricht „Erledigt", Abmelden (`/admin` → `/anmelden`),
