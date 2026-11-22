@@ -114,7 +114,7 @@ export async function renderPrivacy(_r: Route): Promise<HTMLElement> {
       h('li', null, h('strong', null, 'Kontaktformular: '), 'Name, E-Mail-Adresse und Nachricht, nur um Ihnen zu antworten (Art. 6 Abs. 1 lit. b bzw. f DSGVO). Zur Spam-Abwehr zählen wir die Nachrichten je Adresse; eine IP-Adresse speichern wir dafür nicht.'),
       h('li', null, h('strong', null, 'Reichweitenmessung: '), 'Keine. Wir messen keine Besucherzahlen und setzen keine Statistik- oder Tracking-Dienste ein.')),
     h('h2', null, 'Empfänger / Auftragsverarbeiter'), h('ul', null,
-      h('li', null, h('strong', null, 'Supabase '), '(Datenbank, Anmeldung samt Versand der Anmelde-E-Mails, Bildspeicher; Rechenzentrum in Frankfurt am Main).'),
+      h('li', null, h('strong', null, 'Supabase '), '(Datenbank, Anmeldung samt Versand der Anmelde-E-Mails, Bildspeicher; Rechenzentrum in Irland, innerhalb der EU).'),
       h('li', null, h('strong', null, 'Cloudflare '), '(Auslieferung der Seiten und Schutz vor Missbrauch).'),
       h('li', null, h('strong', null, 'Proton '), '(E-Mail-Postfach, über das wir Ihre Nachrichten an kontakt.freihaus@proton.me empfangen).')),
     h('p', null, 'Mit den Dienstleistern schließen wir Auftragsverarbeitungsverträge. Darüber hinaus geben wir Daten nicht weiter.'),

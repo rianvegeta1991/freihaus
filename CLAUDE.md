@@ -11,7 +11,8 @@ Kostenloses Immobilienportal „von privat“ (Kauf und Miete, ohne Makler, ohne
 - **Demo live:** https://rianvegeta1991.github.io/freihaus/ (GitHub Pages, Workflow `.github/workflows/pages.yml`, Unterpfad
   `/freihaus/` über `VITE_BASE`; `noindex`). Repo `rianvegeta1991/freihaus` ist **öffentlich** (Pages geht im Free-Tarif nur so) –
   deshalb nie Schlüssel oder echte Personendaten einchecken. Tiefe Links liefert `404.html` (Status 404, App läuft trotzdem; für SEO ungeeignet).
-- **Supabase-Projekt `fzhaozatyraflbwdspgd` (Frankfurt) läuft**, Migrationen 0001–0005 sind eingespielt (0004 Miete und 0005 Speicher-SELECT-Regel am 8.11.2026, beide live getestet), `kontakt.freihaus@proton.me` ist `admin`.
+- **Supabase-Projekt `fzhaozatyraflbwdspgd` (Region eu-west-1 = Irland, NICHT Frankfurt; Organisation „RianVegeta Corp“, Free) läuft**
+  – **am 22.11.2026 war es wegen Inaktivität pausiert** (Gratis-Tarif pausiert nach ~7 Tagen ohne Aktivität; im Dashboard „Restore project“), Migrationen 0001–0005 sind eingespielt (0004 Miete und 0005 Speicher-SELECT-Regel am 8.11.2026, beide live getestet), `kontakt.freihaus@proton.me` ist `admin`.
   Lokal per `.env.local` (git-ignoriert) angebunden; die **GitHub-Pages-Demo bleibt im Demo-Modus**, bis URL/Key als Actions-Secrets eingetragen sind.
   Der eingebaute Supabase-Mailversand erlaubt nur wenige Anmelde-Mails pro Stunde („email rate limit exceeded") –
   vor dem Start eigenen SMTP-Dienst anbinden und die Auth-Mails eindeutschen (Plan: Brevo, 300 Mails/Tag gratis, EU-Firma; noch nicht eingerichtet).
